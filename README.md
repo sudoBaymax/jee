@@ -1,131 +1,73 @@
-# SecureConnect
+# Welcome to your Lovable project
 
-SecureConnect is a modern web application built with **React, TypeScript, and Vite** that provides a clean, responsive interface for managing secure interactions and workflows.
+## Project info
 
-The application is designed to demonstrate scalable frontend architecture, reusable UI components, and best practices in modern web development.
+**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
 
----
+## How can I edit this code?
 
-## 🚀 What This App Does
+There are several ways of editing your application.
 
-SecureConnect provides:
+**Use Lovable**
 
-* 🔐 A structured and secure user interface
-* 🎨 Responsive design using Tailwind CSS
-* 🧩 Reusable UI components built with shadcn-ui
-* ⚡ Fast development and hot reloading via Vite
-* 🛠 Type-safe development using TypeScript
+Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
 
-The app is built to be extendable and can serve as a foundation for:
+Changes made via Lovable will be committed automatically to this repo.
 
-* Authentication systems
-* Secure communication platforms
-* Workflow dashboards
-* Enterprise internal tools
-* SaaS platforms
+**Use your preferred IDE**
 
----
+If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
 
-## 🏗 Tech Stack
+The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-* **Vite** – Fast development server and bundler
-* **React** – Component-based frontend framework
-* **TypeScript** – Type-safe JavaScript
-* **Tailwind CSS** – Utility-first styling framework
-* **shadcn-ui** – Accessible and customizable UI components
+Follow these steps:
 
----
+```sh
+# Step 1: Clone the repository using the project's Git URL.
+git clone <YOUR_GIT_URL>
 
-## 📦 Installation & Setup
+# Step 2: Navigate to the project directory.
+cd <YOUR_PROJECT_NAME>
 
-Make sure you have **Node.js (v18+) and npm** installed.
+# Step 3: Install the necessary dependencies.
+npm i
 
-### 1️⃣ Clone the repository
-
-```bash
-git clone <your-repository-url>
-cd secure-connect
-```
-
-### 2️⃣ Install dependencies
-
-```bash
-npm install
-```
-
-### 3️⃣ Start the development server
-
-```bash
+# Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
 
-The app will be available at:
+**Edit a file directly in GitHub**
 
-```
-http://localhost:5173
-```
+- Navigate to the desired file(s).
+- Click the "Edit" button (pencil icon) at the top right of the file view.
+- Make your changes and commit the changes.
 
----
+**Use GitHub Codespaces**
 
-## 📁 Project Structure
+- Navigate to the main page of your repository.
+- Click on the "Code" button (green button) near the top right.
+- Select the "Codespaces" tab.
+- Click on "New codespace" to launch a new Codespace environment.
+- Edit files directly within the Codespace and commit and push your changes once you're done.
 
-```
-src/
- ├── components/      # Reusable UI components
- ├── pages/           # Application pages
- ├── hooks/           # Custom React hooks
- ├── lib/             # Utility functions
- ├── styles/          # Global styles
- └── main.tsx         # App entry point
-```
+## What technologies are used for this project?
 
----
+This project is built with:
 
-## 🛠 Build for Production
+- Vite
+- TypeScript
+- React
+- shadcn-ui
+- Tailwind CSS
 
-To generate an optimized production build:
+## How can I deploy this project?
 
-```bash
-npm run build
-```
+Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
 
-To preview the production build locally:
+## Can I connect a custom domain to my Lovable project?
 
-```bash
-npm run preview
-```
+Yes, you can!
 
----
+To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
-## 🌍 Deployment
-
-You can deploy this app to platforms such as:
-
-* Vercel
-* Netlify
-* AWS
-* Azure
-* Render
-* Any static hosting provider
-
-The production output will be generated inside the `dist/` folder.
-
----
-
-## 🔮 Future Improvements
-
-* Authentication & role-based access
-* API integration
-* Database connectivity
-* Real-time features
-* Enhanced security controls
-* Unit and integration testing
-
----
-
-## 📄 License
-
-MIT Licence 
----
-
-If you'd like, tell me what the app *actually does* (for example: attachment coaching app, fraud detection demo, dashboard, etc.), and I can tailor this README to be more product-specific and investor-ready instead of generic.
+Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
