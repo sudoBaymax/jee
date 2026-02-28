@@ -31,6 +31,65 @@ interface Scenario {
   minRounds: number;
 }
 
+const randomScenarios = [
+  {
+    label: 'Your Roommate Won\'t Clean Up',
+    desc: 'You\'ve asked 5 times. The dishes are piling up. You need to set a firm boundary without blowing up.',
+    backstory: 'You\'ve lived together for a year. They\'re fun, but domestically hopeless. Last week you found moldy pasta in a pot they left for 4 days. You\'ve tried hints, you\'ve tried asking nicely, you\'ve tried doing it yourself. Nothing sticks. You just got home to a sink full of dishes again. They\'re on the couch watching TV.',
+    attachmentStyle: 'passive-aggressive',
+    opener: "Oh hey! How was your day? I was gonna do those dishes, I just got caught up in this show. You know how it is. Want to watch with me?",
+  },
+  {
+    label: 'Your Parent Is Guilt-Tripping You',
+    desc: 'Your mom is upset you\'re not coming home for the holidays and is laying it on thick.',
+    backstory: 'You decided to spend the holidays with your partner\'s family this year. You told your mom two weeks ago. She said "fine" but has been sending passive-aggressive texts since. Today she called, and you can tell she\'s been crying. She keeps saying "I just want to see my baby" and "I guess I\'ll just be alone." Your partner is in the other room.',
+    attachmentStyle: 'anxious-preoccupied',
+    opener: "I just don\'t understand why you can\'t come for even one day. I\'ve been cooking your favorite meals all week. Your room is all ready. I even got that blanket you like. But I guess that doesn\'t matter anymore now that you have your new family.",
+  },
+  {
+    label: 'Your Partner Forgot Your Anniversary',
+    desc: 'It\'s your 2-year anniversary. They completely forgot and made plans with friends instead.',
+    backstory: 'You\'ve been looking forward to this for weeks. You bought a gift, made a reservation. This morning you said "happy anniversary" and they looked at you blankly, then said "oh… right." They already told their friends they\'d go to a game tonight. They\'re acting like it\'s not a big deal.',
+    attachmentStyle: 'dismissive-avoidant',
+    opener: "Look, I\'m sorry I forgot, okay? It\'s just a date. We can do something this weekend. I already told the guys I\'d go tonight and I don\'t want to bail on them. You\'re not seriously upset about this, are you?",
+  },
+  {
+    label: 'A Friend Shared Your Secret',
+    desc: 'You told one friend something private. Now the whole group knows.',
+    backstory: 'Two weeks ago you confided in your closest friend that you\'re seeing a therapist for anxiety. Yesterday at a group dinner, someone casually asked "so how\'s therapy going?" You were mortified. Your friend who leaked it is now texting you saying "it just slipped out, it\'s not a big deal, everyone goes to therapy."',
+    attachmentStyle: 'dismissive-avoidant',
+    opener: "Okay I know you\'re mad but honestly I don\'t see why it\'s such a big deal. Everyone goes to therapy now, it\'s nothing to be ashamed of. I was literally just talking about mental health in general and it came up naturally. You\'re making this way bigger than it needs to be.",
+  },
+  {
+    label: 'Your Coworker Takes Credit for Your Work',
+    desc: 'In a team meeting, your coworker presented your idea as theirs. Your boss loved it.',
+    backstory: 'You shared a detailed proposal with your coworker last week for feedback. In today\'s all-hands meeting, they presented the exact same idea — your words, your slides — as their own. The boss praised them. Nobody knows it was yours. You\'re in the break room now and they just walked in.',
+    attachmentStyle: 'fearful-avoidant',
+    opener: "Great meeting, right? I think the boss is really on board. Hey, we should grab lunch — I want to brainstorm some next steps on the project. You always have good ideas.",
+  },
+  {
+    label: 'Your Sibling Keeps Borrowing Money',
+    desc: 'Your sibling is asking for money again. This is the fourth time this year and they never pay you back.',
+    backstory: 'Your younger sibling has borrowed $200, $150, and $300 from you this year with promises to pay back "next month." None of it has been returned. Now they\'re calling asking for $500 for "an emergency." Last time the "emergency" was concert tickets. You love them but you\'re being taken advantage of.',
+    attachmentStyle: 'anxious-preoccupied',
+    opener: "Hey, so I know this is awkward but I\'m in a really tight spot. I wouldn\'t ask if it wasn\'t serious. I just need $500 to cover something and I\'ll pay you back everything next month, I promise. You know I\'m good for it. You\'re the only person I can ask.",
+  },
+];
+
+const getRandomScenario = (): Scenario => {
+  const pick = randomScenarios[Math.floor(Math.random() * randomScenarios.length)];
+  return {
+    id: 'custom-random',
+    label: pick.label,
+    desc: pick.desc,
+    backstory: pick.backstory,
+    icon: AlertTriangle,
+    attachmentStyle: pick.attachmentStyle,
+    opener: pick.opener,
+    minRounds: 6,
+  };
+};
+
 const scenarios: Scenario[] = [
   {
     id: 'avoidant-ex',
@@ -148,7 +207,9 @@ const PracticeChat = () => {
   const navigate = useNavigate();
   const { setChatActive } = useAppState();
 
-  const scenario = scenarios.find(s => s.id === scenarioId);
+  const [customScenario, setCustomScenario] = useState<Scenario | null>(null);
+
+  const activeScenario = customScenario || scenarios.find(s => s.id === scenarioId) || null;
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
@@ -160,8 +221,11 @@ const PracticeChat = () => {
     }
   }, [scenarioId, loading, grading, messages]);
 
-  const startScenario = (id: string) => {
-    const s = scenarios.find(s => s.id === id)!;
+  const startScenario = (id: string, override?: Scenario) => {
+    const s = override || scenarios.find(s => s.id === id)!;
+    setScenarioId(id);
+    if (override) setCustomScenario(override);
+    else setCustomScenario(null);
     setScenarioId(id);
     setChatActive(true);
     setRoundCount(0);
@@ -184,7 +248,7 @@ const PracticeChat = () => {
   };
 
   const sendMessage = async () => {
-    if (!input.trim() || !scenario || loading) return;
+    if (!input.trim() || !activeScenario || loading) return;
 
     const userMsg: Message = { id: Date.now().toString(), sender: 'user', text: input.trim() };
     const newMessages = [...messages, userMsg];
@@ -201,9 +265,9 @@ const PracticeChat = () => {
 
       const { data, error: fnError } = await supabase.functions.invoke('practice-chat', {
         body: {
-          scenario: scenario.label,
-          attachmentStyle: scenario.attachmentStyle,
-          backstory: scenario.backstory,
+          scenario: activeScenario.label,
+          attachmentStyle: activeScenario.attachmentStyle,
+          backstory: activeScenario.backstory,
           messages: chatHistory,
         },
       });
@@ -222,7 +286,7 @@ const PracticeChat = () => {
       };
       setMessages(prev => [...prev, partnerMsg]);
 
-      if (newRound >= scenario.minRounds) {
+      if (newRound >= activeScenario.minRounds) {
         setShowEndOption(true);
       }
     } catch (e: any) {
@@ -240,7 +304,7 @@ const PracticeChat = () => {
     try {
       const { data, error: fnError } = await supabase.functions.invoke('grade-conversation', {
         body: {
-          scenario: `${scenario?.label}: ${scenario?.desc}. Backstory: ${scenario?.backstory}. The partner's attachment style is: ${scenario?.attachmentStyle}`,
+          scenario: `${activeScenario?.label}: ${activeScenario?.desc}. Backstory: ${activeScenario?.backstory}. The partner's attachment style is: ${activeScenario?.attachmentStyle}`,
           messages: messages
             .filter(m => m.sender !== 'system')
             .map(m => ({ sender: m.sender, text: m.text })),
@@ -271,6 +335,24 @@ const PracticeChat = () => {
             <p className="text-muted-foreground text-sm">Choose a scenario — then type freely. The AI will respond in character.</p>
           </div>
           <div className="space-y-3">
+            {/* Random scenario button */}
+            <button
+              onClick={() => {
+                const random = getRandomScenario();
+                startScenario(random.id, random);
+              }}
+              className="w-full bg-card rounded-xl p-5 shadow-soft text-left flex items-start gap-4 hover:shadow-glow transition-shadow border-2 border-dashed border-primary/30"
+            >
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <MessageCircle className="w-5 h-5 text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold">🎲 Surprise Me</p>
+                <p className="text-xs text-primary/70 font-medium mt-0.5">Random scenario each time</p>
+                <p className="text-sm text-muted-foreground leading-snug mt-1">Get a fresh, realistic situation to practice your communication skills.</p>
+              </div>
+            </button>
+
             {scenarios.map(s => {
               const styleLabel = s.attachmentStyle === 'dismissive-avoidant' ? '🧊 Dismissive-Avoidant'
                 : s.attachmentStyle === 'anxious-preoccupied' ? '🔥 Anxious-Preoccupied'
@@ -364,9 +446,9 @@ const PracticeChat = () => {
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex-1">
-          <p className="font-semibold text-sm">{scenario?.label}</p>
+          <p className="font-semibold text-sm">{activeScenario?.label}</p>
           <p className="text-xs text-muted-foreground">
-            {scenario?.attachmentStyle.replace('-', ' ')} • {roundCount} exchange{roundCount !== 1 ? 's' : ''}
+            {activeScenario?.attachmentStyle.replace('-', ' ')} • {roundCount} exchange{roundCount !== 1 ? 's' : ''}
           </p>
         </div>
         {showEndOption && !grading && (
@@ -445,7 +527,7 @@ const PracticeChat = () => {
           {/* Quick reply suggestions */}
           {!loading && (
             <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-              {getQuickReplies(scenario!, roundCount).map((reply, i) => (
+              {getQuickReplies(activeScenario!, roundCount).map((reply, i) => (
                 <button
                   key={i}
                   onClick={() => { setInput(reply); inputRef.current?.focus(); }}
