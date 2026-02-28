@@ -208,6 +208,10 @@ const PracticeChat = () => {
   const { setChatActive } = useAppState();
 
   const [customScenario, setCustomScenario] = useState<Scenario | null>(null);
+  const [showCustomForm, setShowCustomForm] = useState(false);
+  const [customPrompt, setCustomPrompt] = useState('');
+  const [customStyle, setCustomStyle] = useState('dismissive-avoidant');
+  const [generatingCustom, setGeneratingCustom] = useState(false);
 
   const activeScenario = customScenario || scenarios.find(s => s.id === scenarioId) || null;
 
