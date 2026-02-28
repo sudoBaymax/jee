@@ -207,7 +207,9 @@ const PracticeChat = () => {
   const navigate = useNavigate();
   const { setChatActive } = useAppState();
 
-  const scenario = scenarios.find(s => s.id === scenarioId);
+  const [customScenario, setCustomScenario] = useState<Scenario | null>(null);
+
+  const activeScenario = customScenario || scenarios.find(s => s.id === scenarioId) || null;
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
@@ -219,8 +221,11 @@ const PracticeChat = () => {
     }
   }, [scenarioId, loading, grading, messages]);
 
-  const startScenario = (id: string) => {
-    const s = scenarios.find(s => s.id === id)!;
+  const startScenario = (id: string, override?: Scenario) => {
+    const s = override || scenarios.find(s => s.id === id)!;
+    setScenarioId(id);
+    if (override) setCustomScenario(override);
+    else setCustomScenario(null);
     setScenarioId(id);
     setChatActive(true);
     setRoundCount(0);
