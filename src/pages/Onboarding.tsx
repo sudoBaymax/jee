@@ -67,7 +67,7 @@ const Onboarding = () => {
                   <div className="w-20 h-20 rounded-full gradient-hero mx-auto flex items-center justify-center shadow-glow">
                     <span className="text-3xl font-black tracking-tight text-primary-foreground">JEE</span>
                   </div>
-                  <p className="text-sm font-medium text-muted-foreground tracking-wide">Just Enough Emotions</p>
+                  <p className="text-lg font-bold text-foreground tracking-wide">Just Enough Emotions</p>
                   <p className="text-muted-foreground leading-relaxed">
                     Build secure communication skills through personalized coaching and guided practice.
                   </p>
