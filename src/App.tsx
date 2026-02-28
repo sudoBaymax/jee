@@ -11,6 +11,7 @@ import CoachingPlan from "./pages/CoachingPlan";
 import PracticeChat from "./pages/PracticeChat";
 import CouplesSetup from "./pages/CouplesSetup";
 import CouplesChat from "./pages/CouplesChat";
+import CouplesReport from "./pages/CouplesReport";
 import BottomNav from "./components/BottomNav";
 import NotFound from "./pages/NotFound";
 
