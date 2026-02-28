@@ -377,26 +377,52 @@ const PracticeChat = () => {
 
       {/* Input */}
       {!grading && !grade && (
-        <div className="border-t border-border bg-card p-3">
+        <div className="border-t border-border bg-card p-3 space-y-2">
           {showEndOption && (
-            <p className="text-xs text-center text-muted-foreground mb-2">
+            <p className="text-xs text-center text-muted-foreground">
               You can keep chatting or tap "End & Grade" to get feedback
             </p>
           )}
-          <div className="flex gap-2">
-            <input
+          {/* Quick reply suggestions */}
+          {!loading && (
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+              {getQuickReplies(scenario!, roundCount).map((reply, i) => (
+                <button
+                  key={i}
+                  onClick={() => { setInput(reply); inputRef.current?.focus(); }}
+                  className="flex-shrink-0 px-3 py-1.5 rounded-full bg-muted text-xs font-medium text-foreground hover:bg-accent transition-colors border border-border"
+                >
+                  {reply}
+                </button>
+              ))}
+            </div>
+          )}
+          <div className="flex gap-2 items-end">
+            <textarea
               ref={inputRef}
               value={input}
               onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
+              onKeyDown={e => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  sendMessage();
+                }
+              }}
               placeholder="Type your response…"
               disabled={loading}
-              className="flex-1 px-4 py-2.5 rounded-xl bg-background border border-border outline-none text-sm placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/30 transition-shadow disabled:opacity-50"
+              rows={1}
+              className="flex-1 px-4 py-2.5 rounded-xl bg-background border border-border outline-none text-sm placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/30 transition-shadow disabled:opacity-50 resize-none max-h-32 overflow-y-auto"
+              style={{ minHeight: '42px' }}
+              onInput={e => {
+                const target = e.target as HTMLTextAreaElement;
+                target.style.height = 'auto';
+                target.style.height = Math.min(target.scrollHeight, 128) + 'px';
+              }}
             />
             <button
               onClick={sendMessage}
               disabled={loading || !input.trim()}
-              className="w-10 h-10 rounded-xl gradient-hero flex items-center justify-center shadow-glow hover:opacity-90 transition-opacity disabled:opacity-50"
+              className="w-10 h-10 rounded-xl gradient-hero flex items-center justify-center shadow-glow hover:opacity-90 transition-opacity disabled:opacity-50 flex-shrink-0"
             >
               <Send className="w-4 h-4 text-primary-foreground" />
             </button>
