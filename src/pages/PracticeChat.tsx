@@ -366,6 +366,7 @@ const PracticeChat = () => {
           attachmentStyle: activeScenario.attachmentStyle,
           backstory: activeScenario.backstory,
           messages: chatHistory,
+          intensity,
         },
       });
 
