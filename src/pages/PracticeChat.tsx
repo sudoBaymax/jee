@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Send, Loader2, Award, MessageCircle, UserX, Heart, Briefcase, Shield, AlertTriangle, PenLine, Undo2, Mic, MicOff } from 'lucide-react';
+import { ArrowLeft, Send, Loader2, Award, MessageCircle, UserX, Heart, Briefcase, Shield, AlertTriangle, PenLine, Undo2, Mic, MicOff, Gauge } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAppState } from '@/context/AppContext';
@@ -213,6 +213,7 @@ const PracticeChat = () => {
   const [customStyle, setCustomStyle] = useState('dismissive-avoidant');
   const [generatingCustom, setGeneratingCustom] = useState(false);
   const [revertToId, setRevertToId] = useState<string | null>(null);
+  const [intensity, setIntensity] = useState(7);
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
   const activeScenario = customScenario || scenarios.find(s => s.id === scenarioId) || null;
@@ -316,6 +317,7 @@ const PracticeChat = () => {
           attachmentStyle: customStyle,
           backstory: `The user described this situation: "${customPrompt.trim()}". Create a realistic opening line as the other person in this scenario.`,
           messages: [],
+          intensity,
         },
       });
       if (fnError) throw fnError;
@@ -364,6 +366,7 @@ const PracticeChat = () => {
           attachmentStyle: activeScenario.attachmentStyle,
           backstory: activeScenario.backstory,
           messages: chatHistory,
+          intensity,
         },
       });
 
@@ -506,6 +509,26 @@ const PracticeChat = () => {
                         ))}
                       </div>
                     </div>
+                    <div>
+                      <label className="text-sm font-medium text-foreground mb-2 block">
+                        Intensity: {intensity}/10
+                        <span className="text-xs text-muted-foreground ml-2">
+                          {intensity <= 3 ? '😌 Mild' : intensity <= 5 ? '😐 Moderate' : intensity <= 7 ? '😤 Challenging' : '🔥 Intense'}
+                        </span>
+                      </label>
+                      <input
+                        type="range"
+                        min={1}
+                        max={10}
+                        value={intensity}
+                        onChange={e => setIntensity(Number(e.target.value))}
+                        className="w-full accent-primary"
+                      />
+                      <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                        <span>Easy-going</span>
+                        <span>Very difficult</span>
+                      </div>
+                    </div>
                     <button
                       onClick={startCustomScenario}
                       disabled={!customPrompt.trim() || generatingCustom}
@@ -613,24 +636,40 @@ const PracticeChat = () => {
   return (
     <div className="h-screen flex flex-col bg-background">
       {/* Header */}
-      <div className="p-4 border-b border-border bg-card flex items-center gap-3">
-        <button onClick={exitChat} className="text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <div className="flex-1">
-          <p className="font-semibold text-sm">{activeScenario?.label}</p>
-          <p className="text-xs text-muted-foreground">
-            {activeScenario?.attachmentStyle.replace('-', ' ')} • {roundCount} exchange{roundCount !== 1 ? 's' : ''}
-          </p>
-        </div>
-        {!grading && roundCount >= 1 && (
-          <button
-            onClick={endAndGrade}
-            className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors"
-          >
-            End & Grade
+      <div className="border-b border-border bg-card">
+        <div className="p-4 flex items-center gap-3">
+          <button onClick={exitChat} className="text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="w-5 h-5" />
           </button>
-        )}
+          <div className="flex-1">
+            <p className="font-semibold text-sm">{activeScenario?.label}</p>
+            <p className="text-xs text-muted-foreground">
+              {activeScenario?.attachmentStyle.replace('-', ' ')} • {roundCount} exchange{roundCount !== 1 ? 's' : ''}
+            </p>
+          </div>
+          {!grading && roundCount >= 1 && (
+            <button
+              onClick={endAndGrade}
+              className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors"
+            >
+              End & Grade
+            </button>
+          )}
+        </div>
+        <div className="px-4 pb-3 flex items-center gap-3">
+          <Gauge className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+          <input
+            type="range"
+            min={1}
+            max={10}
+            value={intensity}
+            onChange={e => setIntensity(Number(e.target.value))}
+            className="flex-1 accent-primary h-1.5"
+          />
+          <span className="text-xs text-muted-foreground w-20 text-right flex-shrink-0">
+            {intensity <= 3 ? '😌 Mild' : intensity <= 5 ? '😐 Moderate' : intensity <= 7 ? '😤 Hard' : '🔥 Intense'}
+          </span>
+        </div>
       </div>
 
       {/* Messages */}
