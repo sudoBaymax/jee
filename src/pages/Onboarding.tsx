@@ -65,9 +65,9 @@ const Onboarding = () => {
               <div className="space-y-6">
                 <div className="text-center space-y-3">
                   <div className="w-16 h-16 rounded-full gradient-hero mx-auto flex items-center justify-center shadow-glow">
-                    <Heart className="w-8 h-8 text-primary-foreground" />
+                    <span className="text-2xl font-black tracking-tight text-primary-foreground">JEE</span>
                   </div>
-                  <h1 className="text-3xl font-bold">Attachment Coach</h1>
+                  <h1 className="text-3xl font-bold">JEE</h1>
                   <p className="text-muted-foreground leading-relaxed">
                     Build secure communication skills through personalized coaching and guided practice.
                   </p>
