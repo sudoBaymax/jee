@@ -11,8 +11,8 @@ const navItems = [
 const BottomNav = () => {
   const location = useLocation();
 
-  // Hide on onboarding
-  if (location.pathname === '/') return null;
+  // Hide on onboarding and assessment
+  if (location.pathname === '/' || location.pathname === '/assessment') return null;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50">
