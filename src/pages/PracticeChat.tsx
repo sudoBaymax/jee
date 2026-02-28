@@ -644,9 +644,9 @@ const PracticeChat = () => {
             </p>
           )}
           {/* Quick reply suggestions */}
-          {!loading && (
+          {!loading && activeScenario && (
             <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-              {getQuickReplies(activeScenario!, roundCount).map((reply, i) => (
+              {getQuickReplies(activeScenario, roundCount).map((reply, i) => (
                 <button
                   key={i}
                   onClick={() => { setInput(reply); inputRef.current?.focus(); }}
