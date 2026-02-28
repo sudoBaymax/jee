@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Send, Loader2, Award, MessageCircle, UserX, Heart, Briefcase, Shield, AlertTriangle, PenLine, Undo2 } from 'lucide-react';
+import { ArrowLeft, Send, Loader2, Award, MessageCircle, UserX, Heart, Briefcase, Shield, AlertTriangle, PenLine, Undo2, Mic, MicOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAppState } from '@/context/AppContext';
@@ -213,7 +213,43 @@ const PracticeChat = () => {
   const [customStyle, setCustomStyle] = useState('dismissive-avoidant');
   const [generatingCustom, setGeneratingCustom] = useState(false);
   const [revertToId, setRevertToId] = useState<string | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
   const activeScenario = customScenario || scenarios.find(s => s.id === scenarioId) || null;
+
+  const startListening = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast.error('Speech recognition not supported in this browser.');
+      return;
+    }
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+    recognitionRef.current = recognition;
+
+    recognition.onresult = (event: any) => {
+      let transcript = '';
+      for (let i = 0; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript;
+      }
+      setInput(transcript);
+    };
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error:', event.error);
+      setIsListening(false);
+      if (event.error === 'not-allowed') toast.error('Microphone access denied.');
+    };
+    recognition.onend = () => setIsListening(false);
+    recognition.start();
+    setIsListening(true);
+  };
+
+  const stopListening = () => {
+    recognitionRef.current?.stop();
+    setIsListening(false);
+  };
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
@@ -696,7 +732,7 @@ const PracticeChat = () => {
                   sendMessage();
                 }
               }}
-              placeholder="Type your response…"
+              placeholder={isListening ? "Listening…" : "Type or tap 🎙 to speak…"}
               disabled={loading}
               rows={1}
               className="flex-1 px-4 py-2.5 rounded-xl bg-background border border-border outline-none text-sm placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/30 transition-shadow disabled:opacity-50 resize-none max-h-32 overflow-y-auto"
@@ -708,7 +744,19 @@ const PracticeChat = () => {
               }}
             />
             <button
-              onClick={sendMessage}
+              onClick={isListening ? stopListening : startListening}
+              disabled={loading}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all flex-shrink-0 ${
+                isListening
+                  ? 'bg-destructive text-destructive-foreground animate-pulse'
+                  : 'bg-muted hover:bg-accent text-foreground border border-border'
+              }`}
+              title={isListening ? 'Stop recording' : 'Speak your response'}
+            >
+              {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            </button>
+            <button
+              onClick={() => { if (isListening) stopListening(); sendMessage(); }}
               disabled={loading || !input.trim()}
               className="w-10 h-10 rounded-xl gradient-hero flex items-center justify-center shadow-glow hover:opacity-90 transition-opacity disabled:opacity-50 flex-shrink-0"
             >
