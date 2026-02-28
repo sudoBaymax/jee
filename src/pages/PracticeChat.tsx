@@ -265,9 +265,9 @@ const PracticeChat = () => {
 
       const { data, error: fnError } = await supabase.functions.invoke('practice-chat', {
         body: {
-          scenario: scenario.label,
-          attachmentStyle: scenario.attachmentStyle,
-          backstory: scenario.backstory,
+          scenario: activeScenario.label,
+          attachmentStyle: activeScenario.attachmentStyle,
+          backstory: activeScenario.backstory,
           messages: chatHistory,
         },
       });
