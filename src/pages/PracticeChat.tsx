@@ -368,7 +368,7 @@ const PracticeChat = () => {
         id: 'user-custom',
         label: customPrompt.trim().slice(0, 60),
         desc: customPrompt.trim(),
-        backstory: customPrompt.trim(),
+        backstory: customPrompt.trim() + (screenshots.length > 0 ? ' [User provided screenshot references of how this person communicates]' : ''),
         icon: PenLine,
         attachmentStyle: customStyle,
         opener: data.reply,
@@ -377,6 +377,7 @@ const PracticeChat = () => {
       startScenario(custom.id, custom);
       setShowCustomForm(false);
       setCustomPrompt('');
+      setScreenshots([]);
     } catch (e: any) {
       console.error('Custom scenario error:', e);
       toast.error('Failed to generate scenario. Try again.');
