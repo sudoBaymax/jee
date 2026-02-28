@@ -286,7 +286,7 @@ const PracticeChat = () => {
       };
       setMessages(prev => [...prev, partnerMsg]);
 
-      if (newRound >= scenario.minRounds) {
+      if (newRound >= activeScenario.minRounds) {
         setShowEndOption(true);
       }
     } catch (e: any) {
