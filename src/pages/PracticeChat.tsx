@@ -358,6 +358,7 @@ const PracticeChat = () => {
           backstory: `The user described this situation: "${customPrompt.trim()}". Create a realistic opening line as the other person in this scenario.`,
           messages: [],
           intensity,
+          screenshots: screenshots.length > 0 ? screenshots : undefined,
         },
       });
       if (fnError) throw fnError;
