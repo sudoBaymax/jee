@@ -551,6 +551,49 @@ const PracticeChat = () => {
                         ))}
                       </div>
                     </div>
+                    {/* Screenshot upload */}
+                    <div>
+                      <label className="text-sm font-medium text-foreground mb-1.5 block">Screenshots of their texts <span className="text-muted-foreground font-normal">(optional)</span></label>
+                      <p className="text-xs text-muted-foreground mb-2">Upload screenshots of real conversations so the AI mimics their style</p>
+                      <div
+                        ref={dropZoneRef}
+                        onDrop={handleDrop}
+                        onDragOver={e => { e.preventDefault(); e.stopPropagation(); }}
+                        onClick={() => fileInputRef.current?.click()}
+                        className="border-2 border-dashed border-border rounded-lg p-4 text-center cursor-pointer hover:border-primary/40 transition-colors"
+                      >
+                        <ImagePlus className="w-6 h-6 mx-auto text-muted-foreground mb-1" />
+                        <p className="text-xs text-muted-foreground">Drag & drop, paste, or click to upload</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{screenshots.length}/5 screenshots</p>
+                      </div>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        className="hidden"
+                        onChange={e => {
+                          const files = Array.from(e.target.files || []);
+                          files.forEach(addScreenshot);
+                          e.target.value = '';
+                        }}
+                      />
+                      {screenshots.length > 0 && (
+                        <div className="flex gap-2 mt-2 overflow-x-auto pb-1">
+                          {screenshots.map((src, i) => (
+                            <div key={i} className="relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border border-border">
+                              <img src={src} alt={`Screenshot ${i + 1}`} className="w-full h-full object-cover" />
+                              <button
+                                onClick={(e) => { e.stopPropagation(); setScreenshots(prev => prev.filter((_, j) => j !== i)); }}
+                                className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                     <div>
                       <label className="text-sm font-medium text-foreground mb-2 block">
                         Intensity: {intensity}/10

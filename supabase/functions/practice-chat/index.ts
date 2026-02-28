@@ -122,13 +122,37 @@ CRITICAL RULES:
 - If the user is communicating in a healthy way, you can SLOWLY warm up or soften — but don't immediately become healthy yourself. Realistic change is gradual and resistant.
 - You can be difficult. You can be frustrating. That's the point — this is practice for the user.`;
 
-    const aiMessages = [
+    // Build messages, including screenshots as multimodal content if provided
+    const aiMessages: any[] = [
       { role: "system", content: systemPrompt },
+    ];
+
+    // If screenshots provided, add them as a user message with images for the AI to analyze
+    if (screenshots && Array.isArray(screenshots) && screenshots.length > 0) {
+      const imageContent: any[] = [
+        { type: "text", text: "Here are screenshots of how this person actually communicates. Study their texting style, tone, vocabulary, and patterns. Mimic them closely:" },
+      ];
+      for (const src of screenshots) {
+        // src is a data URL like "data:image/png;base64,..."
+        const match = src.match(/^data:(image\/[^;]+);base64,(.+)$/);
+        if (match) {
+          imageContent.push({
+            type: "image_url",
+            image_url: { url: src },
+          });
+        }
+      }
+      aiMessages.push({ role: "user", content: imageContent });
+      aiMessages.push({ role: "assistant", content: "I've studied these screenshots carefully. I'll mimic this person's exact communication style, tone, vocabulary, and texting patterns in my responses." });
+    }
+
+    // Add conversation messages
+    aiMessages.push(
       ...messages.map((m: { sender: string; text: string }) => ({
         role: m.sender === "user" ? "user" : "assistant",
         content: m.text,
-      })),
-    ];
+      }))
+    );
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
