@@ -587,7 +587,7 @@ const PracticeChat = () => {
             {activeScenario?.attachmentStyle.replace('-', ' ')} • {roundCount} exchange{roundCount !== 1 ? 's' : ''}
           </p>
         </div>
-        {showEndOption && !grading && (
+        {!grading && roundCount >= 1 && (
           <button
             onClick={endAndGrade}
             className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors"
