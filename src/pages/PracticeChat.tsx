@@ -285,7 +285,7 @@ const PracticeChat = () => {
               Try Again
             </button>
             <button
-              onClick={() => { setScenarioId(null); setMessages([]); setGrade(null); }}
+              onClick={exitChat}
               className="flex-1 py-3 rounded-xl gradient-hero text-primary-foreground text-sm font-semibold shadow-glow hover:opacity-90 transition-opacity"
             >
               New Scenario
