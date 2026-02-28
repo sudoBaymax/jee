@@ -95,7 +95,7 @@ const CouplesReport = () => {
         </div>
       </header>
 
-      <div className="max-w-3xl mx-auto px-4 py-6">
+      <div className="max-w-3xl mx-auto px-4 py-6 pb-20">
         {loading && (
           <motion.div
             initial={{ opacity: 0 }}
