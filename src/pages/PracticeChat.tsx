@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Send, Loader2, Award, MessageCircle, UserX, Heart, Briefcase, Shield, AlertTriangle, PenLine } from 'lucide-react';
+import { ArrowLeft, Send, Loader2, Award, MessageCircle, UserX, Heart, Briefcase, Shield, AlertTriangle, PenLine, Undo2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAppState } from '@/context/AppContext';
@@ -212,7 +212,7 @@ const PracticeChat = () => {
   const [customPrompt, setCustomPrompt] = useState('');
   const [customStyle, setCustomStyle] = useState('dismissive-avoidant');
   const [generatingCustom, setGeneratingCustom] = useState(false);
-
+  const [revertToId, setRevertToId] = useState<string | null>(null);
   const activeScenario = customScenario || scenarios.find(s => s.id === scenarioId) || null;
 
   useEffect(() => {
@@ -251,6 +251,23 @@ const PracticeChat = () => {
     setChatActive(false);
     setShowCustomForm(false);
     setCustomPrompt('');
+    setRevertToId(null);
+  };
+
+  const confirmRevert = () => {
+    if (!revertToId) return;
+    const idx = messages.findIndex(m => m.id === revertToId);
+    if (idx === -1) { setRevertToId(null); return; }
+    // Keep messages up to (but not including) the selected user message
+    const kept = messages.slice(0, idx);
+    setMessages(kept);
+    // Recalculate round count (number of user messages remaining)
+    const userMsgsLeft = kept.filter(m => m.sender === 'user').length;
+    setRoundCount(userMsgsLeft);
+    setShowEndOption(userMsgsLeft >= (activeScenario?.minRounds || 6));
+    setRevertToId(null);
+    setError(null);
+    toast.success('Conversation reverted');
   };
 
   const startCustomScenario = async () => {
@@ -590,18 +607,29 @@ const PracticeChat = () => {
               animate={{ opacity: 1, y: 0 }}
               className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                msg.sender === 'user' ? 'gradient-hero text-primary-foreground rounded-br-md' :
-                msg.sender === 'system' ? 'bg-sage-light text-foreground border border-primary/20 rounded-bl-md' :
-                'bg-card text-foreground border border-border rounded-bl-md'
-              }`}>
-                {msg.sender === 'partner' && (
-                  <span className="text-xs font-semibold block mb-1 text-secondary">💬 Them</span>
+              <div className="relative group max-w-[85%]">
+                <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+                  msg.sender === 'user' ? 'gradient-hero text-primary-foreground rounded-br-md' :
+                  msg.sender === 'system' ? 'bg-sage-light text-foreground border border-primary/20 rounded-bl-md' :
+                  'bg-card text-foreground border border-border rounded-bl-md'
+                }`}>
+                  {msg.sender === 'partner' && (
+                    <span className="text-xs font-semibold block mb-1 text-secondary">💬 Them</span>
+                  )}
+                  {msg.sender === 'system' && (
+                    <span className="text-xs font-semibold block mb-1 text-primary">📖 Context</span>
+                  )}
+                  {msg.text}
+                </div>
+                {msg.sender === 'user' && !grading && !grade && (
+                  <button
+                    onClick={() => setRevertToId(msg.id)}
+                    className="absolute -left-8 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-full bg-muted hover:bg-accent border border-border"
+                    title="Revert to before this message"
+                  >
+                    <Undo2 className="w-3.5 h-3.5 text-muted-foreground" />
+                  </button>
                 )}
-                {msg.sender === 'system' && (
-                  <span className="text-xs font-semibold block mb-1 text-primary">📖 Context</span>
-                )}
-                {msg.text}
               </div>
             </motion.div>
           ))}
@@ -689,6 +717,51 @@ const PracticeChat = () => {
           </div>
         </div>
       )}
+
+      {/* Revert confirmation overlay */}
+      <AnimatePresence>
+        {revertToId && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={() => setRevertToId(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              className="bg-card rounded-2xl p-6 shadow-lg border border-border max-w-sm w-full space-y-4"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center">
+                  <Undo2 className="w-5 h-5 text-destructive" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground">Revert conversation?</h3>
+                  <p className="text-xs text-muted-foreground">Everything after this point will be deleted</p>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setRevertToId(null)}
+                  className="flex-1 py-2.5 rounded-xl bg-muted text-sm font-medium text-foreground hover:bg-accent transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmRevert}
+                  className="flex-1 py-2.5 rounded-xl bg-destructive text-destructive-foreground text-sm font-medium hover:bg-destructive/90 transition-colors"
+                >
+                  Revert
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
