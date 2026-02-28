@@ -2,7 +2,7 @@
 
 **JEE (Just Enough Emotions)** is an AI-powered emotional intelligence and communication coaching application designed to help users understand their attachment style, regulate emotions, and build secure relationship behaviors through guided practice and simulated conversations.
 
-JEE combines psychology-informed frameworks with interactive AI roleplay to help users move toward secure attachment and stronger communication skills — both personally and professionally.
+JEE combines psychology-informed frameworks with interactive AI roleplay to help users move toward secure attachment and stronger communication skills, both personally and professionally.
 
 ---
 
