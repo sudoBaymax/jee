@@ -732,7 +732,7 @@ const PracticeChat = () => {
                   sendMessage();
                 }
               }}
-              placeholder="Type your response…"
+              placeholder={isListening ? "Listening…" : "Type or tap 🎙 to speak…"}
               disabled={loading}
               rows={1}
               className="flex-1 px-4 py-2.5 rounded-xl bg-background border border-border outline-none text-sm placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/30 transition-shadow disabled:opacity-50 resize-none max-h-32 overflow-y-auto"
@@ -744,7 +744,19 @@ const PracticeChat = () => {
               }}
             />
             <button
-              onClick={sendMessage}
+              onClick={isListening ? stopListening : startListening}
+              disabled={loading}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all flex-shrink-0 ${
+                isListening
+                  ? 'bg-destructive text-destructive-foreground animate-pulse'
+                  : 'bg-muted hover:bg-accent text-foreground border border-border'
+              }`}
+              title={isListening ? 'Stop recording' : 'Speak your response'}
+            >
+              {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            </button>
+            <button
+              onClick={() => { if (isListening) stopListening(); sendMessage(); }}
               disabled={loading || !input.trim()}
               className="w-10 h-10 rounded-xl gradient-hero flex items-center justify-center shadow-glow hover:opacity-90 transition-opacity disabled:opacity-50 flex-shrink-0"
             >
