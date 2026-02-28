@@ -526,6 +526,7 @@ const PracticeChat = () => {
                         <span>Easy-going</span>
                         <span>Very difficult</span>
                       </div>
+                    </div>
                     <button
                       onClick={startCustomScenario}
                       disabled={!customPrompt.trim() || generatingCustom}
