@@ -11,9 +11,13 @@ export interface AssessmentResult {
   secure: number;
   anxious: number;
   avoidant: number;
+  fearfulAvoidant: number;
   lean: string;
   triggers: string[];
   completedAt?: string;
+  aiInsight?: string;
+  patterns?: string[];
+  growthAreas?: string[];
 }
 
 export interface DayProgress {
