@@ -95,7 +95,7 @@ const Assessment = () => {
     setAnswers(next);
 
     if (currentQ < questions.length - 1) {
-      setTimeout(() => setCurrentQ(c => c + 1), 200);
+      setTimeout(() => setCurrentQ(c => Math.min(c + 1, questions.length - 1)), 200);
       return;
     }
 
