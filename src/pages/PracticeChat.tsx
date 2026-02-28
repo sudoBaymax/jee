@@ -74,6 +74,65 @@ const scenarios: Scenario[] = [
   },
 ];
 
+const getQuickReplies = (scenario: Scenario, round: number): string[] => {
+  if (round === 0) {
+    // First response options
+    if (scenario.attachmentStyle === 'dismissive-avoidant') {
+      return [
+        "I'm glad you reached out, but I need to understand what changed.",
+        "Honestly, I'm not sure why I agreed to this.",
+        "You said you missed me. What does that actually mean?",
+      ];
+    }
+    if (scenario.attachmentStyle === 'anxious-preoccupied') {
+      return [
+        "I understand you were worried, and I'm sorry my phone died.",
+        "I hear you're upset, but I need you to hear my side too.",
+        "That sounds really scary for you. Can we talk about it calmly?",
+      ];
+    }
+    if (scenario.attachmentStyle === 'fearful-avoidant') {
+      return [
+        "Actually, I wanted to talk about the meeting on Wednesday.",
+        "I appreciate that, but I need to bring something up.",
+        "Thanks — but I don't think we're on the same page about something.",
+      ];
+    }
+    return [
+      "I appreciate you checking in. I do want to talk about something specific.",
+      "Thanks — yeah, there's something that's been on my mind.",
+      "I'm okay, but I need to be honest with you about something.",
+    ];
+  }
+  // Mid-conversation options
+  if (scenario.attachmentStyle === 'dismissive-avoidant') {
+    return [
+      "I hear you, but that doesn't really answer my question.",
+      "I need more than that. Can you be specific?",
+      "That's not what I'm asking. What do you actually want?",
+    ];
+  }
+  if (scenario.attachmentStyle === 'anxious-preoccupied') {
+    return [
+      "I understand your feelings are valid, and so are mine.",
+      "I need you to trust me. Can we talk about what would help?",
+      "I'm not going to apologize for having a life outside of us.",
+    ];
+  }
+  if (scenario.attachmentStyle === 'fearful-avoidant') {
+    return [
+      "I want to be direct — what happened in that meeting wasn't okay.",
+      "I need to know I can trust you to have my back.",
+      "Can we agree on how to handle this going forward?",
+    ];
+  }
+  return [
+    "I need you to respect that boundary.",
+    "I love you, but this pattern needs to change.",
+    "What I need from you going forward is…",
+  ];
+};
+
 const PracticeChat = () => {
   const [scenarioId, setScenarioId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
