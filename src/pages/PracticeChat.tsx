@@ -446,9 +446,9 @@ const PracticeChat = () => {
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex-1">
-          <p className="font-semibold text-sm">{scenario?.label}</p>
+          <p className="font-semibold text-sm">{activeScenario?.label}</p>
           <p className="text-xs text-muted-foreground">
-            {scenario?.attachmentStyle.replace('-', ' ')} • {roundCount} exchange{roundCount !== 1 ? 's' : ''}
+            {activeScenario?.attachmentStyle.replace('-', ' ')} • {roundCount} exchange{roundCount !== 1 ? 's' : ''}
           </p>
         </div>
         {showEndOption && !grading && (
