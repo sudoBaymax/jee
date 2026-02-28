@@ -85,12 +85,12 @@ Grade on A-F scale. Be encouraging but honest.`,
                   strengths: {
                     type: "array",
                     items: { type: "string" },
-                    description: "List of 2-4 specific things they did well with examples from the conversation",
+                    description: "List of 2-4 things they did well. Each MUST quote the user's actual words, then name the communication principle it demonstrates (e.g. 'Name the feeling', 'Soft startup', 'Boundary with care') and explain why it was effective.",
                   },
                   improvements: {
                     type: "array",
                     items: { type: "string" },
-                    description: "List of 2-4 specific areas to improve with concrete suggestions",
+                    description: "List of 2-4 areas to improve. Each MUST quote the user's actual problematic message, name the communication principle that applies, and provide a concrete reworded alternative.",
                   },
                   rewriteExample: {
                     type: "string",
