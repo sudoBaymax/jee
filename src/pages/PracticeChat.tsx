@@ -215,8 +215,48 @@ const PracticeChat = () => {
   const [revertToId, setRevertToId] = useState<string | null>(null);
   const [intensity, setIntensity] = useState(7);
   const [isListening, setIsListening] = useState(false);
+  const [screenshots, setScreenshots] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
+  const dropZoneRef = useRef<HTMLDivElement>(null);
   const activeScenario = customScenario || scenarios.find(s => s.id === scenarioId) || null;
+
+  const addScreenshot = useCallback((file: File) => {
+    if (!file.type.startsWith('image/')) { toast.error('Only images are supported'); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error('Image must be under 5MB'); return; }
+    if (screenshots.length >= 5) { toast.error('Max 5 screenshots'); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setScreenshots(prev => [...prev, reader.result as string]);
+      }
+    };
+    reader.readAsDataURL(file);
+  }, [screenshots.length]);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const files = Array.from(e.dataTransfer.files);
+    files.forEach(addScreenshot);
+  }, [addScreenshot]);
+
+  const handlePaste = useCallback((e: ClipboardEvent) => {
+    if (!showCustomForm) return;
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const item of Array.from(items)) {
+      if (item.type.startsWith('image/')) {
+        const file = item.getAsFile();
+        if (file) addScreenshot(file);
+      }
+    }
+  }, [showCustomForm, addScreenshot]);
+
+  useEffect(() => {
+    document.addEventListener('paste', handlePaste);
+    return () => document.removeEventListener('paste', handlePaste);
+  }, [handlePaste]);
 
   const startListening = () => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
