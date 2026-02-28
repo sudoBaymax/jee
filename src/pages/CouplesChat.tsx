@@ -95,13 +95,28 @@ const CouplesChat = () => {
     setInput('');
     setLoading(true);
 
+    // Optimistic update - show message immediately
+    const optimisticMsg: Message = {
+      id: crypto.randomUUID(),
+      sender: role,
+      sender_name: myName,
+      content: text,
+      created_at: new Date().toISOString(),
+    };
+    setMessages(prev => [...prev, optimisticMsg]);
+
     // Insert message
-    await supabase.from('couples_messages').insert({
+    const { data: inserted } = await supabase.from('couples_messages').insert({
       session_id: session.id,
       sender: role,
       sender_name: myName,
       content: text,
-    });
+    }).select().single();
+
+    // Replace optimistic message with real one
+    if (inserted) {
+      setMessages(prev => prev.map(m => m.id === optimisticMsg.id ? (inserted as Message) : m));
+    }
 
     // Update spoke flag
     await supabase.from('couples_sessions').update({
