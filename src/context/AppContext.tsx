@@ -44,6 +44,8 @@ interface AppState {
   setProgress: (p: DayProgress[]) => void;
   currentDay: number;
   setCurrentDay: (d: number) => void;
+  chatActive: boolean;
+  setChatActive: (v: boolean) => void;
 }
 
 const AppContext = createContext<AppState | null>(null);
