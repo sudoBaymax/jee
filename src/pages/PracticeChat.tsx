@@ -31,6 +31,65 @@ interface Scenario {
   minRounds: number;
 }
 
+const randomScenarios = [
+  {
+    label: 'Your Roommate Won\'t Clean Up',
+    desc: 'You\'ve asked 5 times. The dishes are piling up. You need to set a firm boundary without blowing up.',
+    backstory: 'You\'ve lived together for a year. They\'re fun, but domestically hopeless. Last week you found moldy pasta in a pot they left for 4 days. You\'ve tried hints, you\'ve tried asking nicely, you\'ve tried doing it yourself. Nothing sticks. You just got home to a sink full of dishes again. They\'re on the couch watching TV.',
+    attachmentStyle: 'passive-aggressive',
+    opener: "Oh hey! How was your day? I was gonna do those dishes, I just got caught up in this show. You know how it is. Want to watch with me?",
+  },
+  {
+    label: 'Your Parent Is Guilt-Tripping You',
+    desc: 'Your mom is upset you\'re not coming home for the holidays and is laying it on thick.',
+    backstory: 'You decided to spend the holidays with your partner\'s family this year. You told your mom two weeks ago. She said "fine" but has been sending passive-aggressive texts since. Today she called, and you can tell she\'s been crying. She keeps saying "I just want to see my baby" and "I guess I\'ll just be alone." Your partner is in the other room.',
+    attachmentStyle: 'anxious-preoccupied',
+    opener: "I just don\'t understand why you can\'t come for even one day. I\'ve been cooking your favorite meals all week. Your room is all ready. I even got that blanket you like. But I guess that doesn\'t matter anymore now that you have your new family.",
+  },
+  {
+    label: 'Your Partner Forgot Your Anniversary',
+    desc: 'It\'s your 2-year anniversary. They completely forgot and made plans with friends instead.',
+    backstory: 'You\'ve been looking forward to this for weeks. You bought a gift, made a reservation. This morning you said "happy anniversary" and they looked at you blankly, then said "oh… right." They already told their friends they\'d go to a game tonight. They\'re acting like it\'s not a big deal.',
+    attachmentStyle: 'dismissive-avoidant',
+    opener: "Look, I\'m sorry I forgot, okay? It\'s just a date. We can do something this weekend. I already told the guys I\'d go tonight and I don\'t want to bail on them. You\'re not seriously upset about this, are you?",
+  },
+  {
+    label: 'A Friend Shared Your Secret',
+    desc: 'You told one friend something private. Now the whole group knows.',
+    backstory: 'Two weeks ago you confided in your closest friend that you\'re seeing a therapist for anxiety. Yesterday at a group dinner, someone casually asked "so how\'s therapy going?" You were mortified. Your friend who leaked it is now texting you saying "it just slipped out, it\'s not a big deal, everyone goes to therapy."',
+    attachmentStyle: 'dismissive-avoidant',
+    opener: "Okay I know you\'re mad but honestly I don\'t see why it\'s such a big deal. Everyone goes to therapy now, it\'s nothing to be ashamed of. I was literally just talking about mental health in general and it came up naturally. You\'re making this way bigger than it needs to be.",
+  },
+  {
+    label: 'Your Coworker Takes Credit for Your Work',
+    desc: 'In a team meeting, your coworker presented your idea as theirs. Your boss loved it.',
+    backstory: 'You shared a detailed proposal with your coworker last week for feedback. In today\'s all-hands meeting, they presented the exact same idea — your words, your slides — as their own. The boss praised them. Nobody knows it was yours. You\'re in the break room now and they just walked in.',
+    attachmentStyle: 'fearful-avoidant',
+    opener: "Great meeting, right? I think the boss is really on board. Hey, we should grab lunch — I want to brainstorm some next steps on the project. You always have good ideas.",
+  },
+  {
+    label: 'Your Sibling Keeps Borrowing Money',
+    desc: 'Your sibling is asking for money again. This is the fourth time this year and they never pay you back.',
+    backstory: 'Your younger sibling has borrowed $200, $150, and $300 from you this year with promises to pay back "next month." None of it has been returned. Now they\'re calling asking for $500 for "an emergency." Last time the "emergency" was concert tickets. You love them but you\'re being taken advantage of.',
+    attachmentStyle: 'anxious-preoccupied',
+    opener: "Hey, so I know this is awkward but I\'m in a really tight spot. I wouldn\'t ask if it wasn\'t serious. I just need $500 to cover something and I\'ll pay you back everything next month, I promise. You know I\'m good for it. You\'re the only person I can ask.",
+  },
+];
+
+const getRandomScenario = (): Scenario => {
+  const pick = randomScenarios[Math.floor(Math.random() * randomScenarios.length)];
+  return {
+    id: 'custom-random',
+    label: pick.label,
+    desc: pick.desc,
+    backstory: pick.backstory,
+    icon: AlertTriangle,
+    attachmentStyle: pick.attachmentStyle,
+    opener: pick.opener,
+    minRounds: 6,
+  };
+};
+
 const scenarios: Scenario[] = [
   {
     id: 'avoidant-ex',
