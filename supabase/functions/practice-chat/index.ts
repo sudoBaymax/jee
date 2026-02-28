@@ -79,7 +79,18 @@ serve(async (req) => {
 
     const stylePrompt = attachmentPrompts[attachmentStyle] || attachmentPrompts["dismissive-avoidant"];
 
+    // Intensity scale: 1 = very mild/almost secure, 10 = extremely intense/toxic
+    const intensityGuide = intensity <= 3
+      ? `INTENSITY: LOW. You are only mildly showing traits of this attachment style. You're mostly reasonable, just slightly leaning toward these tendencies. You catch yourself, you're somewhat self-correcting. The user should have a relatively easy time communicating with you.`
+      : intensity <= 5
+      ? `INTENSITY: MODERATE. You show clear signs of this attachment style but you're not extreme. You push back but can be reached. You deflect sometimes but aren't hostile. A balanced challenge for the user.`
+      : intensity <= 7
+      ? `INTENSITY: HIGH. You are firmly in this attachment style. You deflect, shut down, cling, or spiral depending on your style. You're difficult but not cruel. The user needs to work hard to communicate effectively.`
+      : `INTENSITY: VERY HIGH. You are deeply entrenched in this attachment style at its most challenging. You may gaslight, stonewall, love-bomb aggressively, or be highly unpredictable. This is an intense practice session — be a very difficult conversational partner.`;
+
     const systemPrompt = `${stylePrompt}
+
+${intensityGuide}
 
 SCENARIO: "${scenario}"
 BACKSTORY: ${backstory}
