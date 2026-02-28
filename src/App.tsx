@@ -11,6 +11,7 @@ import CoachingPlan from "./pages/CoachingPlan";
 import PracticeChat from "./pages/PracticeChat";
 import CouplesSetup from "./pages/CouplesSetup";
 import CouplesChat from "./pages/CouplesChat";
+import CouplesReport from "./pages/CouplesReport";
 import BottomNav from "./components/BottomNav";
 import NotFound from "./pages/NotFound";
 
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/practice" element={<PracticeChat />} />
             <Route path="/couples" element={<CouplesSetup />} />
             <Route path="/couples/chat/:code" element={<CouplesChat />} />
+            <Route path="/couples/report/:code" element={<CouplesReport />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <BottomNav />

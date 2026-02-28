@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.couples-chat]
 verify_jwt = false
+
+[functions.couples-report]
+verify_jwt = false
