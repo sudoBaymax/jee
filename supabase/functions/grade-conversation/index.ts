@@ -33,6 +33,22 @@ serve(async (req) => {
 
 Analyze the user's communication style and grade them. Use the tool provided to return structured feedback.
 
+CRITICAL INSTRUCTION - QUOTE THE CONVERSATION:
+- In your strengths and improvements, ALWAYS quote the user's actual words from the conversation (use quotation marks).
+- After each quote, explain WHY it was effective or problematic by connecting it to a specific communication principle or lesson.
+
+Communication principles to reference (pick the relevant ones):
+1. "Name the feeling" — Labeling specific emotions (e.g. "I feel anxious" vs "I feel bad") activates the prefrontal cortex and reduces emotional flooding.
+2. "Request, don't demand" — Framing needs as requests ("Would you be willing to...") rather than ultimatums preserves the other person's autonomy and reduces defensiveness.
+3. "The 'I' statement" — Leading with "I feel X when Y" instead of "You always/never..." keeps the focus on your experience rather than attacking.
+4. "Soft startup" — Beginning a difficult conversation gently (vs. criticism or contempt) determines 96% of the outcome (Gottman research).
+5. "Bid for connection" — Reaching out to share feelings is a bid; recognizing and turning toward bids builds trust.
+6. "Self-regulation" — Recognizing when you're emotionally flooded and asking for a pause ("I need a moment") prevents reactive damage.
+7. "Boundary with care" — Setting a limit while affirming the relationship ("I love you AND I need X") vs. an ultimatum.
+8. "Curiosity over assumption" — Asking what the other person is experiencing instead of assuming intent ("What was going on for you?" vs "You obviously don't care").
+9. "Repair attempt" — Any effort to de-escalate or reconnect during conflict (humor, touch, apology, acknowledgment).
+10. "Validation before problem-solving" — Acknowledging the other person's feelings before jumping to fix things.
+
 Grading criteria:
 - Did they name specific feelings? (not vague like "bad" but specific like "anxious", "hurt", "overwhelmed")
 - Did they state clear needs or requests?
@@ -69,12 +85,12 @@ Grade on A-F scale. Be encouraging but honest.`,
                   strengths: {
                     type: "array",
                     items: { type: "string" },
-                    description: "List of 2-4 specific things they did well with examples from the conversation",
+                    description: "List of 2-4 things they did well. Each MUST quote the user's actual words, then name the communication principle it demonstrates (e.g. 'Name the feeling', 'Soft startup', 'Boundary with care') and explain why it was effective.",
                   },
                   improvements: {
                     type: "array",
                     items: { type: "string" },
-                    description: "List of 2-4 specific areas to improve with concrete suggestions",
+                    description: "List of 2-4 areas to improve. Each MUST quote the user's actual problematic message, name the communication principle that applies, and provide a concrete reworded alternative.",
                   },
                   rewriteExample: {
                     type: "string",
