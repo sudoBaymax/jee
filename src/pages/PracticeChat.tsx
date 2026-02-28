@@ -213,6 +213,7 @@ const PracticeChat = () => {
   const [customStyle, setCustomStyle] = useState('dismissive-avoidant');
   const [generatingCustom, setGeneratingCustom] = useState(false);
   const [revertToId, setRevertToId] = useState<string | null>(null);
+  const [intensity, setIntensity] = useState(7);
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
   const activeScenario = customScenario || scenarios.find(s => s.id === scenarioId) || null;
