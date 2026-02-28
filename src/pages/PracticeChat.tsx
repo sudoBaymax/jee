@@ -636,24 +636,40 @@ const PracticeChat = () => {
   return (
     <div className="h-screen flex flex-col bg-background">
       {/* Header */}
-      <div className="p-4 border-b border-border bg-card flex items-center gap-3">
-        <button onClick={exitChat} className="text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <div className="flex-1">
-          <p className="font-semibold text-sm">{activeScenario?.label}</p>
-          <p className="text-xs text-muted-foreground">
-            {activeScenario?.attachmentStyle.replace('-', ' ')} • {roundCount} exchange{roundCount !== 1 ? 's' : ''}
-          </p>
-        </div>
-        {!grading && roundCount >= 1 && (
-          <button
-            onClick={endAndGrade}
-            className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors"
-          >
-            End & Grade
+      <div className="border-b border-border bg-card">
+        <div className="p-4 flex items-center gap-3">
+          <button onClick={exitChat} className="text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="w-5 h-5" />
           </button>
-        )}
+          <div className="flex-1">
+            <p className="font-semibold text-sm">{activeScenario?.label}</p>
+            <p className="text-xs text-muted-foreground">
+              {activeScenario?.attachmentStyle.replace('-', ' ')} • {roundCount} exchange{roundCount !== 1 ? 's' : ''}
+            </p>
+          </div>
+          {!grading && roundCount >= 1 && (
+            <button
+              onClick={endAndGrade}
+              className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors"
+            >
+              End & Grade
+            </button>
+          )}
+        </div>
+        <div className="px-4 pb-3 flex items-center gap-3">
+          <Gauge className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+          <input
+            type="range"
+            min={1}
+            max={10}
+            value={intensity}
+            onChange={e => setIntensity(Number(e.target.value))}
+            className="flex-1 accent-primary h-1.5"
+          />
+          <span className="text-xs text-muted-foreground w-20 text-right flex-shrink-0">
+            {intensity <= 3 ? '😌 Mild' : intensity <= 5 ? '😐 Moderate' : intensity <= 7 ? '😤 Hard' : '🔥 Intense'}
+          </span>
+        </div>
       </div>
 
       {/* Messages */}
