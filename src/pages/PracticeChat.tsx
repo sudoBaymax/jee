@@ -249,6 +249,44 @@ const PracticeChat = () => {
     setRoundCount(0);
     setGrade(null);
     setChatActive(false);
+    setShowCustomForm(false);
+    setCustomPrompt('');
+  };
+
+  const startCustomScenario = async () => {
+    if (!customPrompt.trim()) return;
+    setGeneratingCustom(true);
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke('practice-chat', {
+        body: {
+          scenario: customPrompt.trim(),
+          attachmentStyle: customStyle,
+          backstory: `The user described this situation: "${customPrompt.trim()}". Create a realistic opening line as the other person in this scenario.`,
+          messages: [],
+        },
+      });
+      if (fnError) throw fnError;
+      if (data?.error) throw new Error(data.error);
+
+      const custom: Scenario = {
+        id: 'user-custom',
+        label: customPrompt.trim().slice(0, 60),
+        desc: customPrompt.trim(),
+        backstory: customPrompt.trim(),
+        icon: PenLine,
+        attachmentStyle: customStyle,
+        opener: data.reply,
+        minRounds: 6,
+      };
+      startScenario(custom.id, custom);
+      setShowCustomForm(false);
+      setCustomPrompt('');
+    } catch (e: any) {
+      console.error('Custom scenario error:', e);
+      toast.error('Failed to generate scenario. Try again.');
+    } finally {
+      setGeneratingCustom(false);
+    }
   };
 
   const sendMessage = async () => {
