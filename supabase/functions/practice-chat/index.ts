@@ -108,6 +108,7 @@ Your responses should feel like they could have been written by the SAME person 
     const systemPrompt = `${stylePrompt}
 
 ${intensityGuide}
+${screenshotStyleGuide}
 
 SCENARIO: "${scenario}"
 BACKSTORY: ${backstory}
