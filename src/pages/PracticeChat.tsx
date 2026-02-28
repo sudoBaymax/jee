@@ -404,7 +404,7 @@ const PracticeChat = () => {
 
       const { data, error: fnError } = await supabase.functions.invoke('practice-chat', {
         body: {
-          scenario: activeScenario.label,
+          scenario: activeScenario.desc || activeScenario.label,
           attachmentStyle: activeScenario.attachmentStyle,
           backstory: activeScenario.backstory,
           messages: chatHistory,
