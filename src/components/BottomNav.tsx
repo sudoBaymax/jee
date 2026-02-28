@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { Heart, ClipboardCheck, Calendar, MessageCircle } from 'lucide-react';
+import { Heart, ClipboardCheck, Calendar, MessageCircle, Users } from 'lucide-react';
 import { useAppState } from '@/context/AppContext';
 
 const navItems = [
@@ -7,6 +7,7 @@ const navItems = [
   { to: '/assessment', icon: ClipboardCheck, label: 'Assess' },
   { to: '/coach', icon: Calendar, label: 'Plan' },
   { to: '/practice', icon: MessageCircle, label: 'Practice' },
+  { to: '/couples', icon: Users, label: 'Couples' },
 ];
 
 const BottomNav = () => {
@@ -16,6 +17,7 @@ const BottomNav = () => {
   // Hide on onboarding, after assessment completion, and during active chat
   if (location.pathname === '/') return null;
   if (location.pathname === '/assessment' && assessment) return null;
+  if (location.pathname.startsWith('/couples/chat')) return null;
   if (chatActive) return null;
 
   return (
