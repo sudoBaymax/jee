@@ -2,9 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Sparkles, ArrowLeft, Users } from 'lucide-react';
+import { Send, Sparkles, ArrowLeft, Users, Mic, MicOff, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
+import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 
 interface Message {
   id: string;
@@ -39,6 +40,12 @@ const CouplesChat = () => {
   const [aiStreaming, setAiStreaming] = useState(false);
   const [streamingContent, setStreamingContent] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
+  const { isListening, transcript, startListening, stopListening, isSupported } = useSpeechRecognition();
+
+  // Sync transcript to input
+  useEffect(() => {
+    if (transcript) setInput(transcript);
+  }, [transcript]);
 
   // Load session
   useEffect(() => {
@@ -91,11 +98,11 @@ const CouplesChat = () => {
 
   const sendMessage = async () => {
     if (!input.trim() || !session) return;
+    if (isListening) stopListening();
     const text = input.trim();
     setInput('');
     setLoading(true);
 
-    // Optimistic update - show message immediately
     const optimisticMsg: Message = {
       id: crypto.randomUUID(),
       sender: role,
@@ -105,7 +112,6 @@ const CouplesChat = () => {
     };
     setMessages(prev => [...prev, optimisticMsg]);
 
-    // Insert message
     const { data: inserted } = await supabase.from('couples_messages').insert({
       session_id: session.id,
       sender: role,
@@ -113,21 +119,17 @@ const CouplesChat = () => {
       content: text,
     }).select().single();
 
-    // Replace optimistic message with real one
     if (inserted) {
       setMessages(prev => prev.map(m => m.id === optimisticMsg.id ? (inserted as Message) : m));
     }
 
-    // Update spoke flag
     await supabase.from('couples_sessions').update({
       [`${role}_spoke`]: true,
     }).eq('id', session.id);
 
     setLoading(false);
 
-    // Check if AI should respond
     if (session.ai_mode === 'after_both') {
-      // Refresh session to check flags
       const { data: updated } = await supabase
         .from('couples_sessions')
         .select('*')
@@ -138,7 +140,6 @@ const CouplesChat = () => {
         const otherSpoke = role === 'person1' ? s.person2_spoke : s.person1_spoke;
         if (otherSpoke) {
           await requestTherapist();
-          // Reset spoke flags
           await supabase.from('couples_sessions').update({
             person1_spoke: false,
             person2_spoke: false,
@@ -153,7 +154,6 @@ const CouplesChat = () => {
     setAiStreaming(true);
     setStreamingContent('');
 
-    // Get all messages for context
     const { data: allMsgs } = await supabase
       .from('couples_messages')
       .select('*')
@@ -189,7 +189,6 @@ const CouplesChat = () => {
         return;
       }
 
-      // Stream response
       const reader = resp.body!.getReader();
       const decoder = new TextDecoder();
       let fullContent = '';
@@ -223,7 +222,6 @@ const CouplesChat = () => {
         }
       }
 
-      // Save therapist message
       if (fullContent) {
         await supabase.from('couples_messages').insert({
           session_id: session.id,
@@ -239,6 +237,11 @@ const CouplesChat = () => {
 
     setAiStreaming(false);
     setStreamingContent('');
+  };
+
+  const endSession = () => {
+    if (isListening) stopListening();
+    navigate(`/couples/report/${code}`);
   };
 
   const getSenderColor = (sender: string) => {
@@ -282,16 +285,27 @@ const CouplesChat = () => {
               <span className="ml-2 px-1.5 py-0.5 bg-muted rounded text-[10px]">{session.session_code}</span>
             </div>
           </div>
-          {session.ai_mode === 'on_request' && (
-            <button
-              onClick={requestTherapist}
-              disabled={aiStreaming}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors disabled:opacity-40"
-            >
-              <Sparkles className="w-4 h-4" />
-              Ask Therapist
-            </button>
-          )}
+          <div className="flex items-center gap-2">
+            {session.ai_mode === 'on_request' && (
+              <button
+                onClick={requestTherapist}
+                disabled={aiStreaming}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors disabled:opacity-40"
+              >
+                <Sparkles className="w-4 h-4" />
+                Ask Therapist
+              </button>
+            )}
+            {partnerJoined && (
+              <button
+                onClick={endSession}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-destructive/10 text-destructive text-sm font-medium hover:bg-destructive/20 transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                End
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
@@ -312,7 +326,6 @@ const CouplesChat = () => {
       {partnerJoined && (
         <>
           <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 max-w-2xl mx-auto w-full">
-            {/* Situation banner */}
             {session.situation && (
               <div className="bg-muted/50 rounded-xl p-4 text-center">
                 <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Topic</p>
@@ -342,13 +355,8 @@ const CouplesChat = () => {
               ))}
             </AnimatePresence>
 
-            {/* Streaming therapist response */}
             {aiStreaming && streamingContent && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex justify-center"
-              >
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex justify-center">
                 <div className="max-w-[95%] rounded-xl px-4 py-3 border bg-primary/15 border-primary/30">
                   <p className="text-xs font-medium text-muted-foreground mb-1">🧠 Therapist</p>
                   <div className="text-sm prose prose-sm dark:prose-invert max-w-none">
@@ -372,11 +380,23 @@ const CouplesChat = () => {
           {/* Input */}
           <div className="sticky bottom-0 bg-card/80 backdrop-blur-sm border-t border-border px-4 py-3">
             <div className="max-w-2xl mx-auto flex gap-2">
+              {isSupported && (
+                <button
+                  onClick={isListening ? stopListening : startListening}
+                  className={`px-3 rounded-xl border-2 transition-all ${
+                    isListening
+                      ? 'border-destructive bg-destructive/10 text-destructive animate-pulse'
+                      : 'border-border text-muted-foreground hover:border-primary hover:text-primary'
+                  }`}
+                >
+                  {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                </button>
+              )}
               <input
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-                placeholder={`Message as ${myName}...`}
+                placeholder={isListening ? 'Listening...' : `Message as ${myName}...`}
                 className="flex-1 p-3 rounded-xl border-2 border-border bg-background text-foreground focus:border-primary outline-none transition-colors"
                 disabled={loading}
               />
