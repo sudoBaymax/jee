@@ -104,6 +104,7 @@ const PracticeChat = () => {
   const startScenario = (id: string) => {
     const s = scenarios.find(s => s.id === id)!;
     setScenarioId(id);
+    setChatActive(true);
     setRoundCount(0);
     setShowEndOption(false);
     setGrade(null);
@@ -113,6 +114,14 @@ const PracticeChat = () => {
       { id: '0', sender: 'system', text: s.backstory },
       { id: '1', sender: 'partner', text: s.opener },
     ]);
+  };
+
+  const exitChat = () => {
+    setScenarioId(null);
+    setMessages([]);
+    setRoundCount(0);
+    setGrade(null);
+    setChatActive(false);
   };
 
   const sendMessage = async () => {
