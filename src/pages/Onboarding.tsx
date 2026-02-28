@@ -39,9 +39,9 @@ const Onboarding = () => {
   const canNext = step === 0 ? agreed : step === 1 ? selectedGoals.length > 0 : step === 2 ? !!selectedContext : true;
 
   return (
-    <div className="min-h-screen gradient-calm flex items-center justify-center p-4">
+    <div className="min-h-screen gradient-calm flex items-center justify-center px-6 py-8">
       <motion.div
-        className="w-full max-w-lg"
+        className="w-full max-w-xl"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
