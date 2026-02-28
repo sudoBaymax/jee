@@ -717,6 +717,51 @@ const PracticeChat = () => {
           </div>
         </div>
       )}
+
+      {/* Revert confirmation overlay */}
+      <AnimatePresence>
+        {revertToId && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={() => setRevertToId(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              className="bg-card rounded-2xl p-6 shadow-lg border border-border max-w-sm w-full space-y-4"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center">
+                  <Undo2 className="w-5 h-5 text-destructive" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground">Revert conversation?</h3>
+                  <p className="text-xs text-muted-foreground">Everything after this point will be deleted</p>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setRevertToId(null)}
+                  className="flex-1 py-2.5 rounded-xl bg-muted text-sm font-medium text-foreground hover:bg-accent transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmRevert}
+                  className="flex-1 py-2.5 rounded-xl bg-destructive text-destructive-foreground text-sm font-medium hover:bg-destructive/90 transition-colors"
+                >
+                  Revert
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
