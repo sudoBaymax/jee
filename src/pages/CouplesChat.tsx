@@ -55,8 +55,18 @@ const CouplesChat = () => {
         .select('*')
         .eq('session_code', code)
         .maybeSingle();
-      if (data) setSession(data as Session);
-      else toast.error('Session not found');
+      if (data) {
+        setSession(data as Session);
+        // Update history with partner info
+        try {
+          const history = JSON.parse(localStorage.getItem('couples_history') || '[]');
+          const idx = history.findIndex((s: any) => s.code === code);
+          if (idx >= 0) {
+            history[idx].partnerName = role === 'person1' ? data.person2_name : data.person1_name;
+            localStorage.setItem('couples_history', JSON.stringify(history));
+          }
+        } catch {}
+      } else toast.error('Session not found');
     };
     load();
   }, [code]);
