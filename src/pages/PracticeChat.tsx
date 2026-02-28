@@ -507,6 +507,25 @@ const PracticeChat = () => {
                         ))}
                       </div>
                     </div>
+                    <div>
+                      <label className="text-sm font-medium text-foreground mb-2 block">
+                        Intensity: {intensity}/10
+                        <span className="text-xs text-muted-foreground ml-2">
+                          {intensity <= 3 ? '😌 Mild' : intensity <= 5 ? '😐 Moderate' : intensity <= 7 ? '😤 Challenging' : '🔥 Intense'}
+                        </span>
+                      </label>
+                      <input
+                        type="range"
+                        min={1}
+                        max={10}
+                        value={intensity}
+                        onChange={e => setIntensity(Number(e.target.value))}
+                        className="w-full accent-primary"
+                      />
+                      <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                        <span>Easy-going</span>
+                        <span>Very difficult</span>
+                      </div>
                     <button
                       onClick={startCustomScenario}
                       disabled={!customPrompt.trim() || generatingCustom}
