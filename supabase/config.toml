@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.grade-conversation]
 verify_jwt = false
+
+[functions.couples-chat]
+verify_jwt = false

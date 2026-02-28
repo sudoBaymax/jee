@@ -14,7 +14,83 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      couples_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          sender: string
+          sender_name: string
+          session_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          sender: string
+          sender_name?: string
+          session_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          sender?: string
+          sender_name?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "couples_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "couples_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      couples_sessions: {
+        Row: {
+          ai_mode: string
+          created_at: string
+          id: string
+          person1_attachment: string
+          person1_name: string
+          person1_spoke: boolean
+          person2_attachment: string | null
+          person2_name: string | null
+          person2_spoke: boolean
+          session_code: string
+          situation: string | null
+        }
+        Insert: {
+          ai_mode?: string
+          created_at?: string
+          id?: string
+          person1_attachment?: string
+          person1_name?: string
+          person1_spoke?: boolean
+          person2_attachment?: string | null
+          person2_name?: string | null
+          person2_spoke?: boolean
+          session_code: string
+          situation?: string | null
+        }
+        Update: {
+          ai_mode?: string
+          created_at?: string
+          id?: string
+          person1_attachment?: string
+          person1_name?: string
+          person1_spoke?: boolean
+          person2_attachment?: string | null
+          person2_name?: string | null
+          person2_spoke?: boolean
+          session_code?: string
+          situation?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
