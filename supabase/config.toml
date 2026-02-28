@@ -1,1 +1,7 @@
 project_id = "lflnspevhvapdhlarxrb"
+
+[functions.practice-chat]
+verify_jwt = false
+
+[functions.grade-conversation]
+verify_jwt = false
