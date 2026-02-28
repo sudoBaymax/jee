@@ -251,6 +251,23 @@ const PracticeChat = () => {
     setChatActive(false);
     setShowCustomForm(false);
     setCustomPrompt('');
+    setRevertToId(null);
+  };
+
+  const confirmRevert = () => {
+    if (!revertToId) return;
+    const idx = messages.findIndex(m => m.id === revertToId);
+    if (idx === -1) { setRevertToId(null); return; }
+    // Keep messages up to (but not including) the selected user message
+    const kept = messages.slice(0, idx);
+    setMessages(kept);
+    // Recalculate round count (number of user messages remaining)
+    const userMsgsLeft = kept.filter(m => m.sender === 'user').length;
+    setRoundCount(userMsgsLeft);
+    setShowEndOption(userMsgsLeft >= (activeScenario?.minRounds || 6));
+    setRevertToId(null);
+    setError(null);
+    toast.success('Conversation reverted');
   };
 
   const startCustomScenario = async () => {
