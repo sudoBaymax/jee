@@ -248,7 +248,7 @@ const PracticeChat = () => {
   };
 
   const sendMessage = async () => {
-    if (!input.trim() || !scenario || loading) return;
+    if (!input.trim() || !activeScenario || loading) return;
 
     const userMsg: Message = { id: Date.now().toString(), sender: 'user', text: input.trim() };
     const newMessages = [...messages, userMsg];
