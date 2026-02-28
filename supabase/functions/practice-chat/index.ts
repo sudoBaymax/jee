@@ -73,20 +73,37 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { scenario, attachmentStyle, messages, backstory, intensity = 7 } = await req.json();
+    const { scenario, attachmentStyle, messages, backstory, intensity = 7, screenshots } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const stylePrompt = attachmentPrompts[attachmentStyle] || attachmentPrompts["dismissive-avoidant"];
 
-    // Intensity scale: 1 = very mild/almost secure, 10 = extremely intense/toxic
-    const intensityGuide = intensity <= 3
-      ? `INTENSITY: LOW. You are only mildly showing traits of this attachment style. You're mostly reasonable, just slightly leaning toward these tendencies. You catch yourself, you're somewhat self-correcting. The user should have a relatively easy time communicating with you.`
-      : intensity <= 5
-      ? `INTENSITY: MODERATE. You show clear signs of this attachment style but you're not extreme. You push back but can be reached. You deflect sometimes but aren't hostile. A balanced challenge for the user.`
-      : intensity <= 7
-      ? `INTENSITY: HIGH. You are firmly in this attachment style. You deflect, shut down, cling, or spiral depending on your style. You're difficult but not cruel. The user needs to work hard to communicate effectively.`
-      : `INTENSITY: VERY HIGH. You are deeply entrenched in this attachment style at its most challenging. You may gaslight, stonewall, love-bomb aggressively, or be highly unpredictable. This is an intense practice session — be a very difficult conversational partner.`;
+    // Intensity scale: 1-10 with very granular guidance
+    let intensityGuide: string;
+    if (intensity <= 2) {
+      intensityGuide = `INTENSITY: VERY LOW (${intensity}/10). You are BARELY showing this attachment style. You are almost secure — warm, communicative, and reasonable. You might have ONE small moment where a trait slips through (a tiny deflection, a brief moment of clinginess) but you quickly self-correct. You're essentially a good communicator with the faintest hint of this style. Be EASY to talk to. The user should feel like this is a gentle warmup.`;
+    } else if (intensity <= 4) {
+      intensityGuide = `INTENSITY: LOW-MODERATE (${intensity}/10). You show MILD signs of this attachment style. You're mostly reasonable and willing to engage, but you lean into these tendencies occasionally. You might deflect once then come back, get slightly anxious then calm yourself, or be a little unpredictable but ultimately manageable. Think: someone who's done SOME therapy but still has patterns. You can be reached with basic communication skills.`;
+    } else if (intensity <= 6) {
+      intensityGuide = `INTENSITY: MODERATE (${intensity}/10). You clearly exhibit this attachment style — it's noticeable and creates friction. You push back, deflect, cling, or oscillate depending on your style. But you're not impossible to reach. If the user communicates well, you can slowly open up or de-escalate. Think: a real person on an average day, not their worst day.`;
+    } else if (intensity <= 8) {
+      intensityGuide = `INTENSITY: HIGH (${intensity}/10). You are firmly entrenched in this attachment style. You actively resist healthy communication — shutting down, spiraling, getting defensive, or love-bombing. The user needs to work HARD and use strong communication skills to make any progress. You don't easily budge. Think: someone on a bad day, triggered and reactive.`;
+    } else {
+      intensityGuide = `INTENSITY: EXTREME (${intensity}/10). You are at the PEAK of this attachment style's most challenging behaviors. You may gaslight, stonewall completely, have an anxiety meltdown, love-bomb then rage, or be wildly unpredictable. You are VERY difficult to communicate with. Think: someone deeply triggered, at their absolute worst. This is expert-level practice.`;
+    }
+
+    // Handle screenshots — extract style guidance
+    let screenshotStyleGuide = '';
+    if (screenshots && Array.isArray(screenshots) && screenshots.length > 0) {
+      screenshotStyleGuide = `\n\nIMPORTANT - COMMUNICATION STYLE REFERENCE: The user has provided ${screenshots.length} screenshot(s) of real conversations with this person. Study these carefully and MIMIC the communication patterns you see:
+- Match their texting style (short/long messages, punctuation, emoji usage, capitalization)
+- Mirror their vocabulary and phrase patterns
+- Copy their tone (passive-aggressive, terse, overly sweet, dramatic, etc.)
+- Replicate how they structure arguments or deflect
+- Use similar slang, abbreviations, or speech patterns
+Your responses should feel like they could have been written by the SAME person shown in these screenshots.`;
+    }
 
     const systemPrompt = `${stylePrompt}
 
