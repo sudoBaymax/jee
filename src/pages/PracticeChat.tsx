@@ -301,7 +301,7 @@ const PracticeChat = () => {
     <div className="h-screen flex flex-col bg-background">
       {/* Header */}
       <div className="p-4 border-b border-border bg-card flex items-center gap-3">
-        <button onClick={() => { setScenarioId(null); setMessages([]); setRoundCount(0); }} className="text-muted-foreground hover:text-foreground">
+        <button onClick={exitChat} className="text-muted-foreground hover:text-foreground">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex-1">
