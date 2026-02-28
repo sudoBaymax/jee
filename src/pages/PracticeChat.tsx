@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Send, Loader2, Award, MessageCircle, UserX, Heart, Briefcase, Shield, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Send, Loader2, Award, MessageCircle, UserX, Heart, Briefcase, Shield, AlertTriangle, PenLine } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAppState } from '@/context/AppContext';
@@ -208,6 +208,10 @@ const PracticeChat = () => {
   const { setChatActive } = useAppState();
 
   const [customScenario, setCustomScenario] = useState<Scenario | null>(null);
+  const [showCustomForm, setShowCustomForm] = useState(false);
+  const [customPrompt, setCustomPrompt] = useState('');
+  const [customStyle, setCustomStyle] = useState('dismissive-avoidant');
+  const [generatingCustom, setGeneratingCustom] = useState(false);
 
   const activeScenario = customScenario || scenarios.find(s => s.id === scenarioId) || null;
 
@@ -245,6 +249,44 @@ const PracticeChat = () => {
     setRoundCount(0);
     setGrade(null);
     setChatActive(false);
+    setShowCustomForm(false);
+    setCustomPrompt('');
+  };
+
+  const startCustomScenario = async () => {
+    if (!customPrompt.trim()) return;
+    setGeneratingCustom(true);
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke('practice-chat', {
+        body: {
+          scenario: customPrompt.trim(),
+          attachmentStyle: customStyle,
+          backstory: `The user described this situation: "${customPrompt.trim()}". Create a realistic opening line as the other person in this scenario.`,
+          messages: [],
+        },
+      });
+      if (fnError) throw fnError;
+      if (data?.error) throw new Error(data.error);
+
+      const custom: Scenario = {
+        id: 'user-custom',
+        label: customPrompt.trim().slice(0, 60),
+        desc: customPrompt.trim(),
+        backstory: customPrompt.trim(),
+        icon: PenLine,
+        attachmentStyle: customStyle,
+        opener: data.reply,
+        minRounds: 6,
+      };
+      startScenario(custom.id, custom);
+      setShowCustomForm(false);
+      setCustomPrompt('');
+    } catch (e: any) {
+      console.error('Custom scenario error:', e);
+      toast.error('Failed to generate scenario. Try again.');
+    } finally {
+      setGeneratingCustom(false);
+    }
   };
 
   const sendMessage = async () => {
@@ -352,6 +394,83 @@ const PracticeChat = () => {
                 <p className="text-sm text-muted-foreground leading-snug mt-1">Get a fresh, realistic situation to practice your communication skills.</p>
               </div>
             </button>
+
+            {/* Create Your Own */}
+            <button
+              onClick={() => setShowCustomForm(!showCustomForm)}
+              className="w-full bg-card rounded-xl p-5 shadow-soft text-left flex items-start gap-4 hover:shadow-glow transition-shadow border-2 border-dashed border-accent/50"
+            >
+              <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <PenLine className="w-5 h-5 text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold">✍️ Create Your Own</p>
+                <p className="text-xs text-primary/70 font-medium mt-0.5">Describe any situation</p>
+                <p className="text-sm text-muted-foreground leading-snug mt-1">Type your own scenario and pick the attachment style of the person you're talking to.</p>
+              </div>
+            </button>
+
+            <AnimatePresence>
+              {showCustomForm && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="bg-card rounded-xl p-5 shadow-soft space-y-4 border border-border">
+                    <div>
+                      <label className="text-sm font-medium text-foreground mb-1.5 block">Describe your scenario</label>
+                      <textarea
+                        value={customPrompt}
+                        onChange={e => setCustomPrompt(e.target.value)}
+                        placeholder="e.g. My partner shuts down every time I bring up moving in together. I want to have the conversation tonight..."
+                        className="w-full bg-muted rounded-lg p-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-ring min-h-[100px]"
+                        rows={4}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-foreground mb-2 block">Their attachment style</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          { value: 'dismissive-avoidant', label: '🧊 Avoidant', desc: 'Pulls away, shuts down' },
+                          { value: 'anxious-preoccupied', label: '🔥 Anxious', desc: 'Clingy, needs reassurance' },
+                          { value: 'fearful-avoidant', label: '🌪️ Fearful-Avoidant', desc: 'Hot & cold, unpredictable' },
+                          { value: 'secure', label: '🌿 Secure', desc: 'Calm but still human' },
+                        ].map(style => (
+                          <button
+                            key={style.value}
+                            onClick={() => setCustomStyle(style.value)}
+                            className={`rounded-lg p-3 text-left transition-all border ${
+                              customStyle === style.value
+                                ? 'border-primary bg-primary/10 shadow-sm'
+                                : 'border-border bg-muted/50 hover:border-primary/30'
+                            }`}
+                          >
+                            <p className="text-sm font-medium">{style.label}</p>
+                            <p className="text-xs text-muted-foreground">{style.desc}</p>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <button
+                      onClick={startCustomScenario}
+                      disabled={!customPrompt.trim() || generatingCustom}
+                      className="w-full bg-primary text-primary-foreground rounded-lg py-3 font-medium text-sm disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      {generatingCustom ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Setting the scene...
+                        </>
+                      ) : (
+                        'Start Conversation'
+                      )}
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {scenarios.map(s => {
               const styleLabel = s.attachmentStyle === 'dismissive-avoidant' ? '🧊 Dismissive-Avoidant'
