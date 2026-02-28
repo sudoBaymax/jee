@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Send, Loader2, Award, MessageCircle, UserX, Heart, Briefcase, Shield, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAppState } from '@/context/AppContext';
 
 interface Message {
   id: string;
@@ -73,6 +74,65 @@ const scenarios: Scenario[] = [
   },
 ];
 
+const getQuickReplies = (scenario: Scenario, round: number): string[] => {
+  if (round === 0) {
+    // First response options
+    if (scenario.attachmentStyle === 'dismissive-avoidant') {
+      return [
+        "I'm glad you reached out, but I need to understand what changed.",
+        "Honestly, I'm not sure why I agreed to this.",
+        "You said you missed me. What does that actually mean?",
+      ];
+    }
+    if (scenario.attachmentStyle === 'anxious-preoccupied') {
+      return [
+        "I understand you were worried, and I'm sorry my phone died.",
+        "I hear you're upset, but I need you to hear my side too.",
+        "That sounds really scary for you. Can we talk about it calmly?",
+      ];
+    }
+    if (scenario.attachmentStyle === 'fearful-avoidant') {
+      return [
+        "Actually, I wanted to talk about the meeting on Wednesday.",
+        "I appreciate that, but I need to bring something up.",
+        "Thanks — but I don't think we're on the same page about something.",
+      ];
+    }
+    return [
+      "I appreciate you checking in. I do want to talk about something specific.",
+      "Thanks — yeah, there's something that's been on my mind.",
+      "I'm okay, but I need to be honest with you about something.",
+    ];
+  }
+  // Mid-conversation options
+  if (scenario.attachmentStyle === 'dismissive-avoidant') {
+    return [
+      "I hear you, but that doesn't really answer my question.",
+      "I need more than that. Can you be specific?",
+      "That's not what I'm asking. What do you actually want?",
+    ];
+  }
+  if (scenario.attachmentStyle === 'anxious-preoccupied') {
+    return [
+      "I understand your feelings are valid, and so are mine.",
+      "I need you to trust me. Can we talk about what would help?",
+      "I'm not going to apologize for having a life outside of us.",
+    ];
+  }
+  if (scenario.attachmentStyle === 'fearful-avoidant') {
+    return [
+      "I want to be direct — what happened in that meeting wasn't okay.",
+      "I need to know I can trust you to have my back.",
+      "Can we agree on how to handle this going forward?",
+    ];
+  }
+  return [
+    "I need you to respect that boundary.",
+    "I love you, but this pattern needs to change.",
+    "What I need from you going forward is…",
+  ];
+};
+
 const PracticeChat = () => {
   const [scenarioId, setScenarioId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -84,8 +144,9 @@ const PracticeChat = () => {
   const [roundCount, setRoundCount] = useState(0);
   const [showEndOption, setShowEndOption] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const navigate = useNavigate();
+  const { setChatActive } = useAppState();
 
   const scenario = scenarios.find(s => s.id === scenarioId);
 
@@ -102,6 +163,7 @@ const PracticeChat = () => {
   const startScenario = (id: string) => {
     const s = scenarios.find(s => s.id === id)!;
     setScenarioId(id);
+    setChatActive(true);
     setRoundCount(0);
     setShowEndOption(false);
     setGrade(null);
@@ -111,6 +173,14 @@ const PracticeChat = () => {
       { id: '0', sender: 'system', text: s.backstory },
       { id: '1', sender: 'partner', text: s.opener },
     ]);
+  };
+
+  const exitChat = () => {
+    setScenarioId(null);
+    setMessages([]);
+    setRoundCount(0);
+    setGrade(null);
+    setChatActive(false);
   };
 
   const sendMessage = async () => {
@@ -274,7 +344,7 @@ const PracticeChat = () => {
               Try Again
             </button>
             <button
-              onClick={() => { setScenarioId(null); setMessages([]); setGrade(null); }}
+              onClick={exitChat}
               className="flex-1 py-3 rounded-xl gradient-hero text-primary-foreground text-sm font-semibold shadow-glow hover:opacity-90 transition-opacity"
             >
               New Scenario
@@ -290,7 +360,7 @@ const PracticeChat = () => {
     <div className="h-screen flex flex-col bg-background">
       {/* Header */}
       <div className="p-4 border-b border-border bg-card flex items-center gap-3">
-        <button onClick={() => { setScenarioId(null); setMessages([]); setRoundCount(0); }} className="text-muted-foreground hover:text-foreground">
+        <button onClick={exitChat} className="text-muted-foreground hover:text-foreground">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex-1">
@@ -366,26 +436,52 @@ const PracticeChat = () => {
 
       {/* Input */}
       {!grading && !grade && (
-        <div className="border-t border-border bg-card p-3">
+        <div className="border-t border-border bg-card p-3 space-y-2">
           {showEndOption && (
-            <p className="text-xs text-center text-muted-foreground mb-2">
+            <p className="text-xs text-center text-muted-foreground">
               You can keep chatting or tap "End & Grade" to get feedback
             </p>
           )}
-          <div className="flex gap-2">
-            <input
+          {/* Quick reply suggestions */}
+          {!loading && (
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+              {getQuickReplies(scenario!, roundCount).map((reply, i) => (
+                <button
+                  key={i}
+                  onClick={() => { setInput(reply); inputRef.current?.focus(); }}
+                  className="flex-shrink-0 px-3 py-1.5 rounded-full bg-muted text-xs font-medium text-foreground hover:bg-accent transition-colors border border-border"
+                >
+                  {reply}
+                </button>
+              ))}
+            </div>
+          )}
+          <div className="flex gap-2 items-end">
+            <textarea
               ref={inputRef}
               value={input}
               onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
+              onKeyDown={e => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  sendMessage();
+                }
+              }}
               placeholder="Type your response…"
               disabled={loading}
-              className="flex-1 px-4 py-2.5 rounded-xl bg-background border border-border outline-none text-sm placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/30 transition-shadow disabled:opacity-50"
+              rows={1}
+              className="flex-1 px-4 py-2.5 rounded-xl bg-background border border-border outline-none text-sm placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/30 transition-shadow disabled:opacity-50 resize-none max-h-32 overflow-y-auto"
+              style={{ minHeight: '42px' }}
+              onInput={e => {
+                const target = e.target as HTMLTextAreaElement;
+                target.style.height = 'auto';
+                target.style.height = Math.min(target.scrollHeight, 128) + 'px';
+              }}
             />
             <button
               onClick={sendMessage}
               disabled={loading || !input.trim()}
-              className="w-10 h-10 rounded-xl gradient-hero flex items-center justify-center shadow-glow hover:opacity-90 transition-opacity disabled:opacity-50"
+              className="w-10 h-10 rounded-xl gradient-hero flex items-center justify-center shadow-glow hover:opacity-90 transition-opacity disabled:opacity-50 flex-shrink-0"
             >
               <Send className="w-4 h-4 text-primary-foreground" />
             </button>

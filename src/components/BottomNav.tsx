@@ -11,11 +11,12 @@ const navItems = [
 
 const BottomNav = () => {
   const location = useLocation();
-  const { assessment } = useAppState();
+  const { assessment, chatActive } = useAppState();
 
-  // Hide on onboarding, and on assessment page after quiz is completed
+  // Hide on onboarding, after assessment completion, and during active chat
   if (location.pathname === '/') return null;
   if (location.pathname === '/assessment' && assessment) return null;
+  if (chatActive) return null;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50">

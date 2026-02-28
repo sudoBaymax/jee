@@ -44,6 +44,8 @@ interface AppState {
   setProgress: (p: DayProgress[]) => void;
   currentDay: number;
   setCurrentDay: (d: number) => void;
+  chatActive: boolean;
+  setChatActive: (v: boolean) => void;
 }
 
 const AppContext = createContext<AppState | null>(null);
@@ -64,9 +66,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [assessment, setAssessment] = useState<AssessmentResult | null>(null);
   const [progress, setProgress] = useState<DayProgress[]>([]);
   const [currentDay, setCurrentDay] = useState(1);
+  const [chatActive, setChatActive] = useState(false);
 
   return (
-    <AppContext.Provider value={{ profile, setProfile, assessment, setAssessment, progress, setProgress, currentDay, setCurrentDay }}>
+    <AppContext.Provider value={{ profile, setProfile, assessment, setAssessment, progress, setProgress, currentDay, setCurrentDay, chatActive, setChatActive }}>
       {children}
     </AppContext.Provider>
   );
