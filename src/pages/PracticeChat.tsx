@@ -317,6 +317,7 @@ const PracticeChat = () => {
           attachmentStyle: customStyle,
           backstory: `The user described this situation: "${customPrompt.trim()}". Create a realistic opening line as the other person in this scenario.`,
           messages: [],
+          intensity,
         },
       });
       if (fnError) throw fnError;
