@@ -1,5 +1,6 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { Heart, ClipboardCheck, Calendar, MessageCircle } from 'lucide-react';
+import { useAppState } from '@/context/AppContext';
 
 const navItems = [
   { to: '/', icon: Heart, label: 'Start' },
@@ -10,9 +11,11 @@ const navItems = [
 
 const BottomNav = () => {
   const location = useLocation();
+  const { assessment } = useAppState();
 
-  // Hide on onboarding and assessment
-  if (location.pathname === '/' || location.pathname === '/assessment') return null;
+  // Hide on onboarding, and on assessment page after quiz is completed
+  if (location.pathname === '/') return null;
+  if (location.pathname === '/assessment' && assessment) return null;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50">
