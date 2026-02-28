@@ -330,6 +330,24 @@ const PracticeChat = () => {
             <p className="text-muted-foreground text-sm">Choose a scenario — then type freely. The AI will respond in character.</p>
           </div>
           <div className="space-y-3">
+            {/* Random scenario button */}
+            <button
+              onClick={() => {
+                const random = getRandomScenario();
+                startScenario(random.id, random);
+              }}
+              className="w-full bg-card rounded-xl p-5 shadow-soft text-left flex items-start gap-4 hover:shadow-glow transition-shadow border-2 border-dashed border-primary/30"
+            >
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <MessageCircle className="w-5 h-5 text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold">🎲 Surprise Me</p>
+                <p className="text-xs text-primary/70 font-medium mt-0.5">Random scenario each time</p>
+                <p className="text-sm text-muted-foreground leading-snug mt-1">Get a fresh, realistic situation to practice your communication skills.</p>
+              </div>
+            </button>
+
             {scenarios.map(s => {
               const styleLabel = s.attachmentStyle === 'dismissive-avoidant' ? '🧊 Dismissive-Avoidant'
                 : s.attachmentStyle === 'anxious-preoccupied' ? '🔥 Anxious-Preoccupied'
