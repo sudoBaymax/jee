@@ -85,8 +85,9 @@ const PracticeChat = () => {
   const [roundCount, setRoundCount] = useState(0);
   const [showEndOption, setShowEndOption] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const navigate = useNavigate();
+  const { setChatActive } = useAppState();
 
   const scenario = scenarios.find(s => s.id === scenarioId);
 
