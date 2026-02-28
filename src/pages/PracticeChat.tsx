@@ -304,7 +304,7 @@ const PracticeChat = () => {
     try {
       const { data, error: fnError } = await supabase.functions.invoke('grade-conversation', {
         body: {
-          scenario: `${scenario?.label}: ${scenario?.desc}. Backstory: ${scenario?.backstory}. The partner's attachment style is: ${scenario?.attachmentStyle}`,
+          scenario: `${activeScenario?.label}: ${activeScenario?.desc}. Backstory: ${activeScenario?.backstory}. The partner's attachment style is: ${activeScenario?.attachmentStyle}`,
           messages: messages
             .filter(m => m.sender !== 'system')
             .map(m => ({ sender: m.sender, text: m.text })),
