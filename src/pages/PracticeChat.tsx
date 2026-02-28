@@ -607,18 +607,29 @@ const PracticeChat = () => {
               animate={{ opacity: 1, y: 0 }}
               className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                msg.sender === 'user' ? 'gradient-hero text-primary-foreground rounded-br-md' :
-                msg.sender === 'system' ? 'bg-sage-light text-foreground border border-primary/20 rounded-bl-md' :
-                'bg-card text-foreground border border-border rounded-bl-md'
-              }`}>
-                {msg.sender === 'partner' && (
-                  <span className="text-xs font-semibold block mb-1 text-secondary">💬 Them</span>
+              <div className="relative group max-w-[85%]">
+                <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+                  msg.sender === 'user' ? 'gradient-hero text-primary-foreground rounded-br-md' :
+                  msg.sender === 'system' ? 'bg-sage-light text-foreground border border-primary/20 rounded-bl-md' :
+                  'bg-card text-foreground border border-border rounded-bl-md'
+                }`}>
+                  {msg.sender === 'partner' && (
+                    <span className="text-xs font-semibold block mb-1 text-secondary">💬 Them</span>
+                  )}
+                  {msg.sender === 'system' && (
+                    <span className="text-xs font-semibold block mb-1 text-primary">📖 Context</span>
+                  )}
+                  {msg.text}
+                </div>
+                {msg.sender === 'user' && !grading && !grade && (
+                  <button
+                    onClick={() => setRevertToId(msg.id)}
+                    className="absolute -left-8 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-full bg-muted hover:bg-accent border border-border"
+                    title="Revert to before this message"
+                  >
+                    <Undo2 className="w-3.5 h-3.5 text-muted-foreground" />
+                  </button>
                 )}
-                {msg.sender === 'system' && (
-                  <span className="text-xs font-semibold block mb-1 text-primary">📖 Context</span>
-                )}
-                {msg.text}
               </div>
             </motion.div>
           ))}
