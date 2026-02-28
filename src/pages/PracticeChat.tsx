@@ -212,7 +212,7 @@ const PracticeChat = () => {
   const [customPrompt, setCustomPrompt] = useState('');
   const [customStyle, setCustomStyle] = useState('dismissive-avoidant');
   const [generatingCustom, setGeneratingCustom] = useState(false);
-
+  const [revertToId, setRevertToId] = useState<string | null>(null);
   const activeScenario = customScenario || scenarios.find(s => s.id === scenarioId) || null;
 
   useEffect(() => {
