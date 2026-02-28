@@ -1,9 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { Users, Copy, Check, ArrowRight } from 'lucide-react';
+import { Users, Copy, Check, ArrowRight, History, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
+
+interface SavedSession {
+  code: string;
+  role: string;
+  name: string;
+  partnerName?: string;
+  date: string;
+}
+
+const getSavedSessions = (): SavedSession[] => {
+  try {
+    return JSON.parse(localStorage.getItem('couples_history') || '[]');
+  } catch { return []; }
+};
+
+const saveSession = (session: SavedSession) => {
+  const history = getSavedSessions().filter(s => s.code !== session.code);
+  history.unshift(session);
+  localStorage.setItem('couples_history', JSON.stringify(history.slice(0, 20)));
+};
 
 const attachmentStyles = [
   { id: 'secure', label: 'Secure' },
@@ -48,6 +68,7 @@ const CouplesSetup = () => {
     setCreatedCode(code);
     localStorage.setItem('couples_role', 'person1');
     localStorage.setItem('couples_name', name.trim());
+    saveSession({ code, role: 'person1', name: name.trim(), date: new Date().toISOString() });
   };
 
   const copyCode = () => {
@@ -82,11 +103,20 @@ const CouplesSetup = () => {
       .eq('id', data.id);
     localStorage.setItem('couples_role', 'person2');
     localStorage.setItem('couples_name', name.trim());
+    saveSession({ code: data.session_code, role: 'person2', name: name.trim(), partnerName: data.person1_name, date: new Date().toISOString() });
     setLoading(false);
     navigate(`/couples/chat/${data.session_code}`);
   };
 
   const goToChat = () => navigate(`/couples/chat/${createdCode}`);
+
+  const pastSessions = getSavedSessions();
+
+  const openPastSession = (session: SavedSession) => {
+    localStorage.setItem('couples_role', session.role);
+    localStorage.setItem('couples_name', session.name);
+    navigate(`/couples/chat/${session.code}`);
+  };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-6 py-8">
@@ -119,6 +149,37 @@ const CouplesSetup = () => {
               <p className="font-semibold text-lg">Join a Session</p>
               <p className="text-sm text-muted-foreground">Enter a code from your partner</p>
             </button>
+
+            {pastSessions.length > 0 && (
+              <div className="mt-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <History className="w-4 h-4 text-muted-foreground" />
+                  <p className="text-sm font-medium text-muted-foreground">Past Sessions</p>
+                </div>
+                <div className="space-y-2">
+                  {pastSessions.map(s => (
+                    <button
+                      key={s.code}
+                      onClick={() => openPastSession(s)}
+                      className="w-full p-4 rounded-xl border border-border bg-card/50 hover:border-primary/30 transition-all text-left flex items-center gap-3"
+                    >
+                      <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+                        <MessageSquare className="w-4 h-4 text-muted-foreground" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">
+                          {s.name} {s.partnerName ? `& ${s.partnerName}` : ''}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {s.code} · {new Date(s.date).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
