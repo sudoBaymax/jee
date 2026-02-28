@@ -366,7 +366,7 @@ const PracticeChat = () => {
 
       const custom: Scenario = {
         id: 'user-custom',
-        label: customPrompt.trim().slice(0, 60),
+        label: customPrompt.trim(),
         desc: customPrompt.trim(),
         backstory: customPrompt.trim() + (screenshots.length > 0 ? ' [User provided screenshot references of how this person communicates]' : ''),
         icon: PenLine,
@@ -404,7 +404,7 @@ const PracticeChat = () => {
 
       const { data, error: fnError } = await supabase.functions.invoke('practice-chat', {
         body: {
-          scenario: activeScenario.label,
+          scenario: activeScenario.desc || activeScenario.label,
           attachmentStyle: activeScenario.attachmentStyle,
           backstory: activeScenario.backstory,
           messages: chatHistory,
