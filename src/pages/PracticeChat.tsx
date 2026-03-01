@@ -535,7 +535,7 @@ const PracticeChat = () => {
             <button
               onClick={() => {
                 const random = getRandomScenario();
-                startScenario(random.id, random);
+                requestScenarioStart(random.id, random);
               }}
               className="w-full bg-card rounded-xl p-5 shadow-soft text-left flex items-start gap-4 hover:shadow-glow transition-shadow border-2 border-dashed border-primary/30"
             >
