@@ -768,6 +768,7 @@ const PracticeChat = () => {
             <p className="font-semibold text-sm">{activeScenario?.label}</p>
             <p className="text-xs text-muted-foreground">
               {activeScenario?.attachmentStyle.replace('-', ' ')} • {roundCount} exchange{roundCount !== 1 ? 's' : ''}
+              {voiceConfig && ` • 🔊 ${voiceConfig.voiceName}`}
             </p>
           </div>
           {!grading && roundCount >= 1 && (
@@ -793,6 +794,23 @@ const PracticeChat = () => {
             {intensity <= 3 ? '😌 Mild' : intensity <= 5 ? '😐 Moderate' : intensity <= 7 ? '😤 Hard' : '🔥 Intense'}
           </span>
         </div>
+        {voiceConfig && (
+          <div className="px-4 pb-3 flex items-center justify-between">
+            <VoiceModeToggle mode={voiceMode} onModeChange={setVoiceMode} disabled={grading} />
+            {voiceMode === 'voice-call' && (
+              <button
+                onClick={() => setInVoiceCall(!inVoiceCall)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                  inVoiceCall
+                    ? 'bg-destructive text-destructive-foreground'
+                    : 'bg-primary text-primary-foreground hover:bg-primary/90'
+                }`}
+              >
+                {inVoiceCall ? <><PhoneOff className="w-3.5 h-3.5" /> End Call</> : <><Phone className="w-3.5 h-3.5" /> Start Call</>}
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Messages */}
