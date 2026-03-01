@@ -146,6 +146,17 @@ ${screenshotStyleGuide}
 SCENARIO: "${scenario}"
 BACKSTORY: ${backstory}
 
+EMOTION TAG RULE — MANDATORY:
+At the very END of every response, you MUST include an emotion tag on its own line in this exact format:
+[EMOTION: <emotion>]
+Where <emotion> is one of: happy, frown, crying, blush
+Choose based on YOUR emotional state as the character:
+- happy: you're feeling good, relaxed, warm, or the conversation is going well
+- frown: you're annoyed, frustrated, defensive, shutting down, or dismissive
+- crying: you're hurt, sad, overwhelmed, or emotionally flooded
+- blush: you're embarrassed, caught off guard, vulnerable, or softening
+This tag will be stripped before showing to the user. ALWAYS include it.
+
 ROLE IDENTIFICATION — THIS IS THE MOST IMPORTANT SECTION. READ FIVE TIMES:
 - The USER is the person who DESCRIBED the scenario. They wrote it from THEIR perspective.
 - YOU are the OTHER person — the one the user is describing, the one they need to practice talking TO.
@@ -256,14 +267,19 @@ CRITICAL RULES:
     }
 
     const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content;
-    if (!reply) {
+    const rawReply = data.choices?.[0]?.message?.content;
+    if (!rawReply) {
       return new Response(JSON.stringify({ error: "No response from AI" }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    return new Response(JSON.stringify({ reply }), {
+    // Extract emotion tag from reply
+    const emotionMatch = rawReply.match(/\[EMOTION:\s*(happy|frown|crying|blush)\s*\]/i);
+    const emotion = emotionMatch ? emotionMatch[1].toLowerCase() : "frown";
+    const reply = rawReply.replace(/\n?\[EMOTION:\s*(?:happy|frown|crying|blush)\s*\]/gi, "").trim();
+
+    return new Response(JSON.stringify({ reply, emotion }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
