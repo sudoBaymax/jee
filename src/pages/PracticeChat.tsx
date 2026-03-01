@@ -487,9 +487,9 @@ const PracticeChat = () => {
       };
       setMessages(prev => [...prev, partnerMsg]);
 
-      // Send emotion to tamagotchi via edge function
+      // Send emotion to local device
       if (data.emotion) {
-        supabase.functions.invoke('tamagotchi-emotion', { body: { emotion: data.emotion } }).catch(() => {});
+        fetch(`http://localhost:5000/send-image/${data.emotion}`, { method: 'POST' }).catch(() => {});
       }
 
       // Auto-play TTS for voice message mode
