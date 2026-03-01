@@ -311,6 +311,13 @@ const PracticeChat = () => {
 
   const startScenario = (id: string, override?: Scenario) => {
     const s = override || scenarios.find(s => s.id === id)!;
+    // Show voice setup dialog before starting
+    setPendingScenarioStart({ id, override });
+    setShowVoiceSetup(true);
+  };
+
+  const actuallyStartScenario = (id: string, override?: Scenario) => {
+    const s = override || scenarios.find(s => s.id === id)!;
     setScenarioId(id);
     if (override) setCustomScenario(override);
     else setCustomScenario(null);
@@ -325,6 +332,26 @@ const PracticeChat = () => {
       { id: '0', sender: 'system', text: s.backstory },
       { id: '1', sender: 'partner', text: s.opener },
     ]);
+  };
+
+  const handleVoiceSetupComplete = (config: VoiceConfig) => {
+    setVoiceConfig(config);
+    setVoiceMode('voice-messages');
+    setShowVoiceSetup(false);
+    if (pendingScenarioStart) {
+      actuallyStartScenario(pendingScenarioStart.id, pendingScenarioStart.override);
+      setPendingScenarioStart(null);
+    }
+  };
+
+  const handleVoiceSetupSkip = () => {
+    setVoiceConfig(null);
+    setVoiceMode('text');
+    setShowVoiceSetup(false);
+    if (pendingScenarioStart) {
+      actuallyStartScenario(pendingScenarioStart.id, pendingScenarioStart.override);
+      setPendingScenarioStart(null);
+    }
   };
 
   const exitChat = () => {
