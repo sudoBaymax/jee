@@ -213,12 +213,17 @@ CRITICAL RULES:
     }
 
     // Add conversation messages
-    aiMessages.push(
-      ...messages.map((m: { sender: string; text: string }) => ({
-        role: m.sender === "user" ? "user" : "assistant",
-        content: m.text,
-      }))
-    );
+    if (messages.length === 0) {
+      // Google API requires at least one user message
+      aiMessages.push({ role: "user", content: "Start the conversation. Send me the first message as the other person in this scenario." });
+    } else {
+      aiMessages.push(
+        ...messages.map((m: { sender: string; text: string }) => ({
+          role: m.sender === "user" ? "user" : "assistant",
+          content: m.text,
+        }))
+      );
+    }
 
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/openai/chat/completions`, {
       method: "POST",
