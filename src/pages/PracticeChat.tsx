@@ -605,7 +605,7 @@ const PracticeChat = () => {
                     <div>
                       <div className="flex items-center justify-between mb-1.5">
                         <label className="text-sm font-medium text-foreground">Describe your scenario</label>
-                        <VoiceMicButton onTranscript={(text) => setCustomPrompt(prev => prev ? prev + ' ' + text : text)} />
+                        <VoiceMicButton onTranscript={(text) => setCustomPrompt(text)} />
                       </div>
                       <textarea
                         value={customPrompt}

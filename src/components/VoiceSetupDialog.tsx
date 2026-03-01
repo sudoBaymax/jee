@@ -199,7 +199,7 @@ export default function VoiceSetupDialog({
                   <label className="text-sm font-medium text-foreground">
                     Describe their voice
                   </label>
-                  <VoiceMicButton onTranscript={(text) => setDescription(prev => prev ? prev + ' ' + text : text)} />
+                  <VoiceMicButton onTranscript={(text) => setDescription(text)} />
                 </div>
                 <textarea
                   value={description}
