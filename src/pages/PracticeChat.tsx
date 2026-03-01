@@ -420,9 +420,9 @@ const PracticeChat = () => {
       if (fnError) throw fnError;
       if (data?.error) throw new Error(data.error);
 
-      // Send opener emotion to tamagotchi
+      // Send opener emotion to tamagotchi via edge function
       if (data.emotion) {
-        fetch(`http://localhost:5000/send-image/${data.emotion}`, { method: 'POST' }).catch(() => {});
+        supabase.functions.invoke('tamagotchi-emotion', { body: { emotion: data.emotion } }).catch(() => {});
       }
 
       const custom: Scenario = {
