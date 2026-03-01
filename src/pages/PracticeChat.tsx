@@ -756,7 +756,7 @@ const PracticeChat = () => {
 
           <div className="flex gap-3">
             <button
-              onClick={() => startScenario(scenarioId!, activeScenario || undefined)}
+              onClick={() => requestScenarioStart(scenarioId!, activeScenario || undefined)}
               className="flex-1 py-3 rounded-xl bg-card border border-border text-sm font-semibold hover:bg-muted transition-colors"
             >
               Try Again
