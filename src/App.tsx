@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -28,40 +29,56 @@ const ProtectedCouplesSetup = ProtectedRoute(CouplesSetup);
 const ProtectedCouplesChat = ProtectedRoute(CouplesChat);
 const ProtectedCouplesReport = ProtectedRoute(CouplesReport);
 
-const App = () => (
-  console.log("ORIGIN:", window.location.origin);
-  console.log("FULL URL:", window.location.href);
-  
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AppProvider>
-        <Toaster />
-        <Sonner />
-        <ThemeToggle />
+const App = () => {
+  // 🔎 Debug — runs once on mount
+  useEffect(() => {
+    console.log("ORIGIN:", window.location.origin);
+    console.log("FULL URL:", window.location.href);
+  }, []);
 
-        <BrowserRouter>
-          <div style={{ position: "fixed", top: 12, right: 12, zIndex: 50 }}>
-            <AuthButtons />
-          </div>
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <AppProvider>
+          <Toaster />
+          <Sonner />
+          <ThemeToggle />
 
-          <Routes>
-            <Route path="/" element={<Onboarding />} />
+          <BrowserRouter>
+            {/* Auth Buttons */}
+            <div
+              style={{
+                position: "fixed",
+                top: 12,
+                right: 12,
+                zIndex: 50,
+              }}
+            >
+              <AuthButtons />
+            </div>
 
-            <Route path="/assessment" element={<ProtectedAssessment />} />
-            <Route path="/coach" element={<ProtectedCoachingPlan />} />
-            <Route path="/practice" element={<ProtectedPracticeChat />} />
-            <Route path="/couples" element={<ProtectedCouplesSetup />} />
-            <Route path="/couples/chat/:code" element={<ProtectedCouplesChat />} />
-            <Route path="/couples/report/:code" element={<ProtectedCouplesReport />} />
+            <Routes>
+              {/* Public */}
+              <Route path="/" element={<Onboarding />} />
 
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+              {/* Protected */}
+              <Route path="/assessment" element={<ProtectedAssessment />} />
+              <Route path="/coach" element={<ProtectedCoachingPlan />} />
+              <Route path="/practice" element={<ProtectedPracticeChat />} />
+              <Route path="/couples" element={<ProtectedCouplesSetup />} />
+              <Route path="/couples/chat/:code" element={<ProtectedCouplesChat />} />
+              <Route path="/couples/report/:code" element={<ProtectedCouplesReport />} />
 
-          <BottomNav />
-        </BrowserRouter>
-      </AppProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+              {/* Fallback */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+
+            <BottomNav />
+          </BrowserRouter>
+        </AppProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
