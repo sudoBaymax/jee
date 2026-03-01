@@ -217,9 +217,14 @@ const PracticeChat = () => {
   const [intensity, setIntensity] = useState(7);
   const [isListening, setIsListening] = useState(false);
   const [screenshots, setScreenshots] = useState<string[]>([]);
+  const [voiceConfig, setVoiceConfig] = useState<VoiceConfig>({ mode: 'text', voiceId: null, voiceName: null, voiceDescription: '' });
+  const [showVoiceSetup, setShowVoiceSetup] = useState(false);
+  const [pendingScenarioStart, setPendingScenarioStart] = useState<{ id: string; override?: Scenario } | null>(null);
+  const [playingAudioId, setPlayingAudioId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const activeScenario = customScenario || scenarios.find(s => s.id === scenarioId) || null;
 
   const addScreenshot = useCallback((file: File) => {
