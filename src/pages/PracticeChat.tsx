@@ -482,6 +482,11 @@ const PracticeChat = () => {
       };
       setMessages(prev => [...prev, partnerMsg]);
 
+      // Send emotion to tamagotchi device
+      if (data.emotion) {
+        fetch(`http://localhost:5000/send-image/${data.emotion}`, { method: 'POST' }).catch(() => {});
+      }
+
       // Auto-play TTS for voice message mode
       if (voiceConfig.mode === 'voice-messages' && voiceConfig.voiceId) {
         playTTS(data.reply, voiceConfig.voiceId, partnerMsg.id);
