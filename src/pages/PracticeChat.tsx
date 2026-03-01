@@ -526,6 +526,15 @@ const PracticeChat = () => {
   // --- Scenario Selection ---
   if (!scenarioId) {
     return (
+      <>
+      <VoiceSetupDialog
+        open={showVoiceSetup}
+        onClose={() => { setShowVoiceSetup(false); setPendingScenarioStart(null); }}
+        onConfirm={handleVoiceConfirm}
+        scenario={pendingScenarioStart?.override?.desc || scenarios.find(s => s.id === pendingScenarioStart?.id)?.desc || ''}
+        attachmentStyle={pendingScenarioStart?.override?.attachmentStyle || scenarios.find(s => s.id === pendingScenarioStart?.id)?.attachmentStyle || ''}
+        backstory={pendingScenarioStart?.override?.backstory || scenarios.find(s => s.id === pendingScenarioStart?.id)?.backstory || ''}
+      />
       <div className="min-h-screen gradient-calm flex items-center justify-center p-4">
         <motion.div className="w-full max-w-lg space-y-6" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <button onClick={() => navigate('/coach')} className="text-muted-foreground hover:text-foreground transition-colors">
