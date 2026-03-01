@@ -106,7 +106,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { scenario, attachmentStyle, messages, backstory, intensity = 7, screenshots } = await req.json();
+    const { scenario, attachmentStyle, messages, backstory, intensity = 7, screenshots, voiceDescription } = await req.json();
     const GOOGLE_AI_API_KEY = Deno.env.get("GOOGLE_AI_API_KEY");
     if (!GOOGLE_AI_API_KEY) throw new Error("GOOGLE_AI_API_KEY is not configured");
 

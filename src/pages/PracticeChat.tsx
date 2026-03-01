@@ -993,6 +993,26 @@ const PracticeChat = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Voice Setup Dialog */}
+      <VoiceSetupDialog
+        open={showVoiceSetup}
+        onClose={() => {
+          setShowVoiceSetup(false);
+          setPendingScenarioStart(null);
+        }}
+        onComplete={handleVoiceSetupComplete}
+        onSkip={handleVoiceSetupSkip}
+        scenario={pendingScenarioStart ? (
+          (pendingScenarioStart.override || scenarios.find(s => s.id === pendingScenarioStart.id))?.desc || ''
+        ) : ''}
+        backstory={pendingScenarioStart ? (
+          (pendingScenarioStart.override || scenarios.find(s => s.id === pendingScenarioStart.id))?.backstory || ''
+        ) : ''}
+        attachmentStyle={pendingScenarioStart ? (
+          (pendingScenarioStart.override || scenarios.find(s => s.id === pendingScenarioStart.id))?.attachmentStyle || ''
+        ) : ''}
+      />
     </div>
   );
 };
