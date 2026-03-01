@@ -420,6 +420,11 @@ const PracticeChat = () => {
       if (fnError) throw fnError;
       if (data?.error) throw new Error(data.error);
 
+      // Send opener emotion to tamagotchi
+      if (data.emotion) {
+        fetch(`http://localhost:5000/send-image/${data.emotion}`, { method: 'POST' }).catch(() => {});
+      }
+
       const custom: Scenario = {
         id: 'user-custom',
         label: customPrompt.trim(),
