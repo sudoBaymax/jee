@@ -308,7 +308,12 @@ const PracticeChat = () => {
     }
   }, [scenarioId, loading, grading, messages]);
 
-  const startScenario = (id: string, override?: Scenario) => {
+  const requestScenarioStart = (id: string, override?: Scenario) => {
+    setPendingScenarioStart({ id, override });
+    setShowVoiceSetup(true);
+  };
+
+  const startScenario = (id: string, override?: Scenario, vc?: VoiceConfig) => {
     const s = override || scenarios.find(s => s.id === id)!;
     setScenarioId(id);
     if (override) setCustomScenario(override);
@@ -320,10 +325,55 @@ const PracticeChat = () => {
     setGrade(null);
     setError(null);
     setInput('');
+    if (vc) setVoiceConfig(vc);
+    const openerMsg: Message = { id: '1', sender: 'partner', text: s.opener };
     setMessages([
       { id: '0', sender: 'system', text: s.backstory },
-      { id: '1', sender: 'partner', text: s.opener },
+      openerMsg,
     ]);
+    // Play TTS for opener if voice mode
+    if ((vc || voiceConfig).mode === 'voice-messages' && (vc || voiceConfig).voiceId) {
+      playTTS(s.opener, (vc || voiceConfig).voiceId!, '1');
+    }
+  };
+
+  const handleVoiceConfirm = (config: VoiceConfig) => {
+    setShowVoiceSetup(false);
+    if (pendingScenarioStart) {
+      startScenario(pendingScenarioStart.id, pendingScenarioStart.override, config);
+      setPendingScenarioStart(null);
+    }
+  };
+
+  const playTTS = async (text: string, voiceId: string, msgId: string) => {
+    setPlayingAudioId(msgId);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ text, voiceId }),
+        }
+      );
+      if (!response.ok) throw new Error(`TTS error: ${response.status}`);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audioRef.current = audio;
+      audio.onended = () => {
+        URL.revokeObjectURL(url);
+        setPlayingAudioId(null);
+      };
+      await audio.play();
+    } catch (e) {
+      console.error('TTS playback error:', e);
+      setPlayingAudioId(null);
+    }
   };
 
   const exitChat = () => {
