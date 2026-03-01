@@ -18,15 +18,6 @@ import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
 import AuthButtons from "./components/AuthButtons";
 
-export default function App() {
-  return (
-    <div>
-      <AuthButtons />
-      {/* rest of your app */}
-    </div>
-  );
-}
-
 const queryClient = new QueryClient();
 
 const App = () => (
