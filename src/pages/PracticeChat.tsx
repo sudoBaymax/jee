@@ -836,7 +836,9 @@ const PracticeChat = () => {
                     <span className="text-xs font-semibold block mb-1 text-primary">📖 Context</span>
                   )}
                   {msg.text}
-                </div>
+                  {msg.sender === 'partner' && voiceConfig && voiceMode === 'voice-messages' && (
+                    <VoiceMessageButton text={msg.text} voiceId={voiceConfig.voiceId} />
+                  )}
                 {msg.sender === 'user' && !grading && !grade && (
                   <button
                     onClick={() => setRevertToId(msg.id)}
