@@ -421,9 +421,20 @@ const PracticeChat = () => {
       if (fnError) throw fnError;
       if (data?.error) throw new Error(data.error);
 
+      console.log('[CustomScenario] AI response received:', { reply: data.reply?.substring(0, 50), emotion: data.emotion });
+
       // Send emotion to local device
       if (data.emotion) {
-        fetch(`http://localhost:5000/send-image/${data.emotion}`, { method: 'POST' }).catch(() => {});
+        console.log('[Tamagotchi] Sending emotion to device:', data.emotion);
+        fetch(`http://localhost:5000/send-image/${data.emotion}`, { method: 'POST' })
+          .then(res => {
+            console.log('[Tamagotchi] Device response status:', res.status);
+            return res.json();
+          })
+          .then(json => console.log('[Tamagotchi] Device response:', json))
+          .catch(err => console.warn('[Tamagotchi] Device unreachable:', err.message));
+      } else {
+        console.warn('[Tamagotchi] No emotion returned from AI');
       }
 
       const custom: Scenario = {
@@ -474,12 +485,18 @@ const PracticeChat = () => {
         },
       });
 
-      if (fnError) throw fnError;
+      if (fnError) {
+        console.error('[SendMessage] Edge function error:', fnError);
+        throw fnError;
+      }
+      console.log('[SendMessage] Raw response data:', JSON.stringify(data));
       if (data?.error) {
         if (data.error.includes('Rate limit')) toast.error('Too many messages — slow down a bit.');
         else if (data.error.includes('credits')) toast.error('AI credits exhausted.');
         throw new Error(data.error);
       }
+
+      console.log('[SendMessage] AI response:', { reply: data.reply?.substring(0, 80), emotion: data.emotion });
 
       const partnerMsg: Message = {
         id: (Date.now() + 1).toString(),
@@ -490,7 +507,16 @@ const PracticeChat = () => {
 
       // Send emotion to local device
       if (data.emotion) {
-        fetch(`http://localhost:5000/send-image/${data.emotion}`, { method: 'POST' }).catch(() => {});
+        console.log('[Tamagotchi] Sending emotion to device:', data.emotion);
+        fetch(`http://localhost:5000/send-image/${data.emotion}`, { method: 'POST' })
+          .then(res => {
+            console.log('[Tamagotchi] Device response status:', res.status);
+            return res.json();
+          })
+          .then(json => console.log('[Tamagotchi] Device response:', json))
+          .catch(err => console.warn('[Tamagotchi] Device unreachable:', err.message));
+      } else {
+        console.warn('[Tamagotchi] No emotion in AI response');
       }
 
       // Auto-play TTS for voice message mode
