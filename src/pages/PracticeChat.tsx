@@ -697,7 +697,7 @@ const PracticeChat = () => {
               return (
                 <button
                   key={s.id}
-                  onClick={() => startScenario(s.id)}
+                  onClick={() => requestScenarioStart(s.id)}
                   className="w-full bg-card rounded-xl p-5 shadow-soft text-left flex items-start gap-4 hover:shadow-glow transition-shadow"
                 >
                   <div className="w-10 h-10 rounded-lg bg-sage-light flex items-center justify-center flex-shrink-0 mt-0.5">
