@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAppState } from '@/context/AppContext';
 import VoiceSetupDialog, { VoiceConfig } from '@/components/VoiceSetupDialog';
+import VoiceMicButton from '@/components/VoiceMicButton';
 
 interface Message {
   id: string;

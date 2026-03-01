@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, Volume2, X, Mic, Phone, MessageSquareText } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import VoiceMicButton from '@/components/VoiceMicButton';
 
 export type VoiceMode = 'text' | 'voice-messages' | 'voice-call';
 
