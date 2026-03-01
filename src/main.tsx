@@ -3,17 +3,29 @@ import { Auth0Provider } from "@auth0/auth0-react";
 import App from "./App.tsx";
 import "./index.css";
 
-const domain = import.meta.env.VITE_AUTH0_DOMAIN as string;
-const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID as string;
+const domain = import.meta.env.VITE_AUTH0_DOMAIN as string | undefined;
+const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID as string | undefined;
 
-createRoot(document.getElementById("root")!).render(
-  <Auth0Provider
-    domain={domain}
-    clientId={clientId}
-    authorizationParams={{
-      redirect_uri: window.location.origin,
-    }}
-  >
-    <App />
-  </Auth0Provider>,
-);
+const Root = () => {
+  if (!domain || !clientId) {
+    return (
+      <div style={{ padding: 24, fontFamily: "sans-serif" }}>
+        <h2>Auth0 config missing</h2>
+        <p>
+          Add <b>VITE_AUTH0_DOMAIN</b> and <b>VITE_AUTH0_CLIENT_ID</b> to your environment variables (or .env file).
+        </p>
+        <pre style={{ background: "#f4f4f4", padding: 12, borderRadius: 8 }}>
+          VITE_AUTH0_DOMAIN=dev-xxxxx.us.auth0.com VITE_AUTH0_CLIENT_ID=xxxxxxxxxxxxxxxxxxxx
+        </pre>
+      </div>
+    );
+  }
+
+  return (
+    <Auth0Provider domain={domain} clientId={clientId} authorizationParams={{ redirect_uri: window.location.origin }}>
+      <App />
+    </Auth0Provider>
+  );
+};
+
+createRoot(document.getElementById("root")!).render(<Root />);
