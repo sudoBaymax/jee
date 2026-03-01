@@ -426,7 +426,7 @@ const PracticeChat = () => {
       // Send emotion to local device
       if (data.emotion) {
         console.log('[Tamagotchi] Sending emotion to device:', data.emotion);
-fetch(`https://ma-postmyxedematous-arlie.ngrok-free.dev/send-image/${data.emotion}`, { method: 'POST' })
+        fetch(`https://ma-postmyxedematous-arlie.ngrok-free.dev/send-image/${data.emotion}`, { method: 'POST', headers: { 'ngrok-skip-browser-warning': 'true' } })
           .then(res => {
             console.log('[Tamagotchi] Device response status:', res.status);
             return res.json();
@@ -508,7 +508,7 @@ fetch(`https://ma-postmyxedematous-arlie.ngrok-free.dev/send-image/${data.emotio
       // Send emotion to local device
       if (data.emotion) {
         console.log('[Tamagotchi] Sending emotion to device:', data.emotion);
-        fetch(`https://ma-postmyxedematous-arlie.ngrok-free.dev/send-image/${data.emotion}`, { method: 'POST' })
+        fetch(`https://ma-postmyxedematous-arlie.ngrok-free.dev/send-image/${data.emotion}`, { method: 'POST', headers: { 'ngrok-skip-browser-warning': 'true' } })
           .then(res => {
             console.log('[Tamagotchi] Device response status:', res.status);
             return res.json();
