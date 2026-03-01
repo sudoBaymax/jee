@@ -279,20 +279,6 @@ CRITICAL RULES:
     const emotion = emotionMatch ? emotionMatch[1].toLowerCase() : "frown";
     const reply = rawReply.replace(/\n?\[EMOTION:\s*(?:happy|frown|crying|blush)\s*\]/gi, "").trim();
 
-    // Update tamagotchi emotion in DB for local bridge polling
-    try {
-      const supabase = createClient(
-        Deno.env.get("SUPABASE_URL")!,
-        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-      );
-      await supabase
-        .from("tamagotchi_emotion")
-        .update({ emotion, updated_at: new Date().toISOString() })
-        .eq("id", 1);
-    } catch (err) {
-      console.error("Failed to update tamagotchi emotion:", err);
-    }
-
     return new Response(JSON.stringify({ reply, emotion }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
