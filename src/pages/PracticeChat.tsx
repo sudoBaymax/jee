@@ -430,7 +430,7 @@ const PracticeChat = () => {
         opener: data.reply,
         minRounds: 6,
       };
-      startScenario(custom.id, custom);
+      requestScenarioStart(custom.id, custom);
       setShowCustomForm(false);
       setCustomPrompt('');
       setScreenshots([]);
