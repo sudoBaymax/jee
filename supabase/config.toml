@@ -11,3 +11,12 @@ verify_jwt = false
 
 [functions.couples-report]
 verify_jwt = false
+
+[functions.voice-match]
+verify_jwt = false
+
+[functions.elevenlabs-tts]
+verify_jwt = false
+
+[functions.elevenlabs-conversation-token]
+verify_jwt = false
