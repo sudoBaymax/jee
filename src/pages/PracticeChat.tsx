@@ -750,6 +750,8 @@ const PracticeChat = () => {
   if (grade) {
     const gradeColor = grade.overallGrade.startsWith('A') ? 'text-green-500' : grade.overallGrade.startsWith('B') ? 'text-primary' : 'text-orange-500';
     return (
+      <>
+      {voiceSetupDialogElement}
       <div className="min-h-screen gradient-calm flex items-center justify-center p-4">
         <motion.div className="w-full max-w-lg space-y-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="text-center space-y-3">
