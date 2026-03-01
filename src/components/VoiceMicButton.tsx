@@ -1,5 +1,5 @@
 import { Mic, MicOff } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 
 interface VoiceMicButtonProps {
@@ -9,12 +9,24 @@ interface VoiceMicButtonProps {
 
 export default function VoiceMicButton({ onTranscript, className = '' }: VoiceMicButtonProps) {
   const { isListening, transcript, startListening, stopListening, isSupported } = useSpeechRecognition();
+  const onTranscriptRef = useRef(onTranscript);
+  const lastTranscriptRef = useRef('');
+
+  onTranscriptRef.current = onTranscript;
 
   useEffect(() => {
-    if (transcript) {
-      onTranscript(transcript);
+    if (transcript && transcript !== lastTranscriptRef.current) {
+      lastTranscriptRef.current = transcript;
+      onTranscriptRef.current(transcript);
     }
-  }, [transcript, onTranscript]);
+  }, [transcript]);
+
+  // Reset when stopping
+  useEffect(() => {
+    if (!isListening) {
+      lastTranscriptRef.current = '';
+    }
+  }, [isListening]);
 
   if (!isSupported) return null;
 
