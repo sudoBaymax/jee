@@ -21,6 +21,13 @@ import AuthButtons from "./components/AuthButtons";
 
 const queryClient = new QueryClient();
 
+const ProtectedAssessment = ProtectedRoute(Assessment);
+const ProtectedCoachingPlan = ProtectedRoute(CoachingPlan);
+const ProtectedPracticeChat = ProtectedRoute(PracticeChat);
+const ProtectedCouplesSetup = ProtectedRoute(CouplesSetup);
+const ProtectedCouplesChat = ProtectedRoute(CouplesChat);
+const ProtectedCouplesReport = ProtectedRoute(CouplesReport);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -30,23 +37,19 @@ const App = () => (
         <ThemeToggle />
 
         <BrowserRouter>
-          {/* Optional: show login/logout buttons somewhere visible */}
-          {/* Put this in a header later if you want */}
           <div style={{ position: "fixed", top: 12, right: 12, zIndex: 50 }}>
             <AuthButtons />
           </div>
 
           <Routes>
-            {/* Public landing/onboarding */}
             <Route path="/" element={<Onboarding />} />
 
-            {/* Protected pages */}
-            <Route path="/assessment" element={ProtectedRoute(Assessment)({})} />
-            <Route path="/coach" element={ProtectedRoute(CoachingPlan)({})} />
-            <Route path="/practice" element={ProtectedRoute(PracticeChat)({})} />
-            <Route path="/couples" element={ProtectedRoute(CouplesSetup)({})} />
-            <Route path="/couples/chat/:code" element={ProtectedRoute(CouplesChat)({})} />
-            <Route path="/couples/report/:code" element={ProtectedRoute(CouplesReport)({})} />
+            <Route path="/assessment" element={<ProtectedAssessment />} />
+            <Route path="/coach" element={<ProtectedCoachingPlan />} />
+            <Route path="/practice" element={<ProtectedPracticeChat />} />
+            <Route path="/couples" element={<ProtectedCouplesSetup />} />
+            <Route path="/couples/chat/:code" element={<ProtectedCouplesChat />} />
+            <Route path="/couples/report/:code" element={<ProtectedCouplesReport />} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
