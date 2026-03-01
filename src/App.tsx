@@ -16,6 +16,16 @@ import BottomNav from "./components/BottomNav";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
+import AuthButtons from "./components/AuthButtons";
+
+export default function App() {
+  return (
+    <div>
+      <AuthButtons />
+      {/* rest of your app */}
+    </div>
+  );
+}
 
 const queryClient = new QueryClient();
 
@@ -35,8 +45,6 @@ const App = () => (
             <Route path="/couples" element={<CouplesSetup />} />
             <Route path="/couples/chat/:code" element={<CouplesChat />} />
             <Route path="/couples/report/:code" element={<CouplesReport />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <BottomNav />
