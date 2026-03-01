@@ -29,6 +29,9 @@ const ProtectedCouplesChat = ProtectedRoute(CouplesChat);
 const ProtectedCouplesReport = ProtectedRoute(CouplesReport);
 
 const App = () => (
+  console.log("ORIGIN:", window.location.origin);
+  console.log("FULL URL:", window.location.href);
+  
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AppProvider>
