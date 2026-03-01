@@ -440,14 +440,15 @@ const PracticeChat = () => {
         .map(m => ({ sender: m.sender, text: m.text }));
 
       const { data, error: fnError } = await supabase.functions.invoke('practice-chat', {
-        body: {
-          scenario: activeScenario.desc || activeScenario.label,
-          attachmentStyle: activeScenario.attachmentStyle,
-          backstory: activeScenario.backstory,
-          messages: chatHistory,
-          intensity,
-        },
-      });
+          body: {
+            scenario: activeScenario.desc || activeScenario.label,
+            attachmentStyle: activeScenario.attachmentStyle,
+            backstory: activeScenario.backstory,
+            messages: chatHistory,
+            intensity,
+            voiceDescription: voiceConfig ? `${voiceConfig.voiceDescription}. Speech quirks: ${voiceConfig.speechQuirks.join(', ')}` : undefined,
+          },
+        });
 
       if (fnError) throw fnError;
       if (data?.error) {
