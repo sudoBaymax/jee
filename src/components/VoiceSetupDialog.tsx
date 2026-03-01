@@ -194,9 +194,12 @@ export default function VoiceSetupDialog({
           {mode !== 'text' && (
             <div className="space-y-3">
               <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">
-                  Describe their voice
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-sm font-medium text-foreground">
+                    Describe their voice
+                  </label>
+                  <VoiceMicButton onTranscript={(text) => setDescription(prev => prev ? prev + ' ' + text : text)} />
+                </div>
                 <textarea
                   value={description}
                   onChange={e => setDescription(e.target.value)}
