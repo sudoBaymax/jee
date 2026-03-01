@@ -482,6 +482,11 @@ const PracticeChat = () => {
       };
       setMessages(prev => [...prev, partnerMsg]);
 
+      // Auto-play TTS for voice message mode
+      if (voiceConfig.mode === 'voice-messages' && voiceConfig.voiceId) {
+        playTTS(data.reply, voiceConfig.voiceId, partnerMsg.id);
+      }
+
       if (newRound >= activeScenario.minRounds) {
         setShowEndOption(true);
       }
