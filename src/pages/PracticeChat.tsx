@@ -839,6 +839,7 @@ const PracticeChat = () => {
                   {msg.sender === 'partner' && voiceConfig && voiceMode === 'voice-messages' && (
                     <VoiceMessageButton text={msg.text} voiceId={voiceConfig.voiceId} />
                   )}
+                </div>
                 {msg.sender === 'user' && !grading && !grade && (
                   <button
                     onClick={() => setRevertToId(msg.id)}
