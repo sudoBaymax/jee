@@ -1,31 +1,18 @@
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { LogIn, UserPlus } from 'lucide-react';
+import { useAuth0 } from "@auth0/auth0-react";
 
-const AuthButtons = () => {
-  const navigate = useNavigate();
+export default function AuthButtons() {
+  const { loginWithRedirect, logout, isAuthenticated, isLoading, user } = useAuth0();
+
+  if (isLoading) return <div>Loading...</div>;
+
+  if (!isAuthenticated) {
+    return <button onClick={() => loginWithRedirect()}>Log in</button>;
+  }
 
   return (
-    <div className="flex items-center gap-2">
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => navigate('/login')}
-        className="gap-1.5"
-      >
-        <LogIn className="w-4 h-4" />
-        Log in
-      </Button>
-      <Button
-        size="sm"
-        onClick={() => navigate('/signup')}
-        className="gap-1.5"
-      >
-        <UserPlus className="w-4 h-4" />
-        Sign up
-      </Button>
+    <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+      <span>{user?.name}</span>
+      <button onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}>Log out</button>
     </div>
   );
-};
-
-export default AuthButtons;
+}
