@@ -11,8 +11,8 @@ serve(async (req) => {
 
   try {
     const { answers, scores, lean } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const GOOGLE_AI_API_KEY = Deno.env.get("GOOGLE_AI_API_KEY");
+    if (!GOOGLE_AI_API_KEY) throw new Error("GOOGLE_AI_API_KEY is not configured");
 
     const systemPrompt = `You are Dr. Sue Johnson meets Dr. Amir Levine — a world-class attachment theory expert. 
 You will receive a user's ECR-R (Experiences in Close Relationships - Revised) assessment results.
@@ -42,14 +42,14 @@ Computed scores:
 
 Please analyze these results using the assess_attachment tool.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/openai/chat/completions`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${GOOGLE_AI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "gemini-2.0-flash",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },

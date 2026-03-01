@@ -11,8 +11,8 @@ serve(async (req) => {
 
   try {
     const { messages, person1_name, person1_attachment, person2_name, person2_attachment, situation } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const GOOGLE_AI_API_KEY = Deno.env.get("GOOGLE_AI_API_KEY");
+    if (!GOOGLE_AI_API_KEY) throw new Error("GOOGLE_AI_API_KEY is not configured");
 
     const systemPrompt = `You are an expert couples therapist writing a detailed post-session report. You use Gottman Method and Emotionally Focused Therapy (EFT) frameworks.
 
@@ -90,14 +90,14 @@ IMPORTANT:
       return { role: 'user', content: `[${m.sender_name}]: ${m.content}` };
     });
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/openai/chat/completions`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${GOOGLE_AI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "gemini-2.0-flash",
         messages: [
           { role: "system", content: systemPrompt },
           ...chatHistory,
