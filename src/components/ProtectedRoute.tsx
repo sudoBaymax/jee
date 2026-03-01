@@ -1,28 +1,8 @@
-import { useEffect, useState, ComponentType } from "react";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { withAuthenticationRequired } from "@auth0/auth0-react";
+import type { ComponentType } from "react";
 
-const ProtectedRoute = (Component: ComponentType<any>) => {
-  return function WrappedComponent(props: any) {
-    const navigate = useNavigate();
-    const [loading, setLoading] = useState(true);
-    const [authenticated, setAuthenticated] = useState(false);
-
-    useEffect(() => {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (!session) {
-          navigate("/login", { replace: true });
-        } else {
-          setAuthenticated(true);
-        }
-        setLoading(false);
-      });
-    }, [navigate]);
-
-    if (loading) return null;
-    if (!authenticated) return null;
-    return <Component {...props} />;
-  };
-};
-
-export default ProtectedRoute;
+export default function ProtectedRoute(Component: ComponentType) {
+  return withAuthenticationRequired(Component, {
+    onRedirecting: () => <div>Loading...</div>,
+  });
+}
