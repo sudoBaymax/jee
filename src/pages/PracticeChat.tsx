@@ -851,6 +851,20 @@ const PracticeChat = () => {
                     <span className="text-xs font-semibold block mb-1 text-primary">📖 Context</span>
                   )}
                   {msg.text}
+                  {msg.sender === 'partner' && voiceConfig.mode === 'voice-messages' && voiceConfig.voiceId && (
+                    <button
+                      onClick={() => playTTS(msg.text, voiceConfig.voiceId!, msg.id)}
+                      disabled={playingAudioId === msg.id}
+                      className="inline-flex items-center gap-1 mt-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {playingAudioId === msg.id ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : (
+                        <Volume2 className="w-3 h-3" />
+                      )}
+                      {playingAudioId === msg.id ? 'Playing...' : 'Play'}
+                    </button>
+                  )}
                 </div>
                 {msg.sender === 'user' && !grading && !grade && (
                   <button
