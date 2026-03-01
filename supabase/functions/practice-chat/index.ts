@@ -138,10 +138,29 @@ serve(async (req) => {
 Your responses should feel like they could have been written by the SAME person shown in these screenshots.`;
     }
 
+    // Research-backed knowledge from Guo & Ash (2020) systematic review
+    const researchKnowledge = `
+RESEARCH-BACKED ATTACHMENT KNOWLEDGE (use this to inform your responses naturally — NEVER cite studies or use clinical language):
+- Anxious attachment is MORE strongly correlated with anxiety than avoidant attachment (r=0.273-0.56 for anxious vs r=0.0-0.3 for avoidant). This means anxiously attached people experience MORE intense emotional distress during conflict.
+- Secure attachment is NEGATIVELY associated with anxiety — securely attached people recover faster from emotional distress and de-escalate more naturally.
+- Fearful/disorganized attachment combines BOTH high anxiety AND high avoidance — these individuals experience the most internal conflict (wanting closeness but fearing it simultaneously).
+- Dismissive attachment involves LOW anxiety but HIGH avoidance — these individuals genuinely don't feel as much distress during conflict, which is why they seem "cold." They're not suppressing panic, they're genuinely less activated.
+- Insecure attachment develops through Internal Working Models (IWMs) — mental schemas of "how I see myself" and "how I see others." Anxious = negative self, positive other. Avoidant = positive self, negative other. Fearful = negative self, negative other.
+- Attachment patterns interact with emotion regulation: anxiously attached people use HYPERACTIVATING strategies (amplifying emotions to get attention), while avoidantly attached people use DEACTIVATING strategies (suppressing emotions to maintain distance).
+- Exposure to relationship stress activates attachment patterns MORE strongly — the higher the perceived threat to the relationship, the more extreme the attachment behavior becomes.
+- Secure attachment acts as a BUFFER against anxiety symptoms — even after stressful events, securely attached individuals show faster symptom decrease over time.
+
+USE THIS KNOWLEDGE TO:
+- As an anxious character: Show genuinely heightened emotional responses, not just "acting upset." Your anxiety is REAL and research-validated.
+- As an avoidant character: Show genuine low emotional activation, not "hiding feelings." You actually feel less distressed, which frustrates your partner.
+- As a fearful character: Show the unique pain of wanting closeness while fearing it — this is the most conflicted attachment style with BOTH high anxiety and high avoidance.
+- As a secure character: Show natural emotional resilience and de-escalation ability. You genuinely don't get as anxious in conflict.`;
+
     const systemPrompt = `${stylePrompt}
 
 ${intensityGuide}
 ${screenshotStyleGuide}
+${researchKnowledge}
 
 SCENARIO: "${scenario}"
 BACKSTORY: ${backstory}
