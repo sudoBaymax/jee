@@ -106,7 +106,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { scenario, attachmentStyle, messages, backstory, intensity = 7, screenshots } = await req.json();
+    const { scenario, attachmentStyle, messages, backstory, intensity = 7, screenshots, voiceDescription } = await req.json();
     const GOOGLE_AI_API_KEY = Deno.env.get("GOOGLE_AI_API_KEY");
     if (!GOOGLE_AI_API_KEY) throw new Error("GOOGLE_AI_API_KEY is not configured");
 
@@ -138,10 +138,24 @@ serve(async (req) => {
 Your responses should feel like they could have been written by the SAME person shown in these screenshots.`;
     }
 
+    // Voice description integration
+    let voiceStyleGuide = '';
+    if (voiceDescription) {
+      voiceStyleGuide = `\n\nVOICE & SPEECH PATTERN: The user has described how this person talks: "${voiceDescription}". Incorporate these speech patterns into your TEXT responses. For example:
+- If they stutter: occasionally write stuttered words like "I-I don't know" or "w-what are you talking about"
+- If they swear: include casual profanity naturally
+- If they use filler words: sprinkle in "um", "like", "you know"
+- If they mumble: use ellipses and trailing off "I guess... whatever..."
+- If they talk fast: use run-on sentences without much punctuation
+- If they're slow/deliberate: use periods and pauses between thoughts
+Make these patterns SUBTLE and REALISTIC — don't overdo it.`;
+    }
+
     const systemPrompt = `${stylePrompt}
 
 ${intensityGuide}
 ${screenshotStyleGuide}
+${voiceStyleGuide}
 
 SCENARIO: "${scenario}"
 BACKSTORY: ${backstory}
