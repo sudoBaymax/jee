@@ -91,6 +91,24 @@ export type Database = {
         }
         Relationships: []
       }
+      tamagotchi_emotion: {
+        Row: {
+          emotion: string
+          id: number
+          updated_at: string
+        }
+        Insert: {
+          emotion?: string
+          id?: number
+          updated_at?: string
+        }
+        Update: {
+          emotion?: string
+          id?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
