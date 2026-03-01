@@ -801,6 +801,7 @@ const PracticeChat = () => {
           </div>
         </motion.div>
       </div>
+      </>
     );
   }
 
