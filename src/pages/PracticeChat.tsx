@@ -363,6 +363,9 @@ const PracticeChat = () => {
     setShowCustomForm(false);
     setCustomPrompt('');
     setRevertToId(null);
+    setVoiceConfig(null);
+    setVoiceMode('text');
+    setInVoiceCall(false);
   };
 
   const confirmRevert = () => {
