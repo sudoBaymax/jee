@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Send, Loader2, Award, MessageCircle, UserX, Heart, Briefcase, Shield, AlertTriangle, PenLine, Undo2, Mic, MicOff, Gauge, ImagePlus, X } from 'lucide-react';
+import { ArrowLeft, Send, Loader2, Award, MessageCircle, UserX, Heart, Briefcase, Shield, AlertTriangle, PenLine, Undo2, Mic, MicOff, Gauge, ImagePlus, X, Volume2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAppState } from '@/context/AppContext';
+import VoiceSetupDialog, { VoiceConfig } from '@/components/VoiceSetupDialog';
 
 interface Message {
   id: string;
@@ -216,9 +217,14 @@ const PracticeChat = () => {
   const [intensity, setIntensity] = useState(7);
   const [isListening, setIsListening] = useState(false);
   const [screenshots, setScreenshots] = useState<string[]>([]);
+  const [voiceConfig, setVoiceConfig] = useState<VoiceConfig>({ mode: 'text', voiceId: null, voiceName: null, voiceDescription: '' });
+  const [showVoiceSetup, setShowVoiceSetup] = useState(false);
+  const [pendingScenarioStart, setPendingScenarioStart] = useState<{ id: string; override?: Scenario } | null>(null);
+  const [playingAudioId, setPlayingAudioId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const activeScenario = customScenario || scenarios.find(s => s.id === scenarioId) || null;
 
   const addScreenshot = useCallback((file: File) => {
@@ -302,7 +308,12 @@ const PracticeChat = () => {
     }
   }, [scenarioId, loading, grading, messages]);
 
-  const startScenario = (id: string, override?: Scenario) => {
+  const requestScenarioStart = (id: string, override?: Scenario) => {
+    setPendingScenarioStart({ id, override });
+    setShowVoiceSetup(true);
+  };
+
+  const startScenario = (id: string, override?: Scenario, vc?: VoiceConfig) => {
     const s = override || scenarios.find(s => s.id === id)!;
     setScenarioId(id);
     if (override) setCustomScenario(override);
@@ -314,10 +325,55 @@ const PracticeChat = () => {
     setGrade(null);
     setError(null);
     setInput('');
+    if (vc) setVoiceConfig(vc);
+    const openerMsg: Message = { id: '1', sender: 'partner', text: s.opener };
     setMessages([
       { id: '0', sender: 'system', text: s.backstory },
-      { id: '1', sender: 'partner', text: s.opener },
+      openerMsg,
     ]);
+    // Play TTS for opener if voice mode
+    if ((vc || voiceConfig).mode === 'voice-messages' && (vc || voiceConfig).voiceId) {
+      playTTS(s.opener, (vc || voiceConfig).voiceId!, '1');
+    }
+  };
+
+  const handleVoiceConfirm = (config: VoiceConfig) => {
+    setShowVoiceSetup(false);
+    if (pendingScenarioStart) {
+      startScenario(pendingScenarioStart.id, pendingScenarioStart.override, config);
+      setPendingScenarioStart(null);
+    }
+  };
+
+  const playTTS = async (text: string, voiceId: string, msgId: string) => {
+    setPlayingAudioId(msgId);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ text, voiceId }),
+        }
+      );
+      if (!response.ok) throw new Error(`TTS error: ${response.status}`);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audioRef.current = audio;
+      audio.onended = () => {
+        URL.revokeObjectURL(url);
+        setPlayingAudioId(null);
+      };
+      await audio.play();
+    } catch (e) {
+      console.error('TTS playback error:', e);
+      setPlayingAudioId(null);
+    }
   };
 
   const exitChat = () => {
@@ -374,7 +430,7 @@ const PracticeChat = () => {
         opener: data.reply,
         minRounds: 6,
       };
-      startScenario(custom.id, custom);
+      requestScenarioStart(custom.id, custom);
       setShowCustomForm(false);
       setCustomPrompt('');
       setScreenshots([]);
@@ -426,6 +482,11 @@ const PracticeChat = () => {
       };
       setMessages(prev => [...prev, partnerMsg]);
 
+      // Auto-play TTS for voice message mode
+      if (voiceConfig.mode === 'voice-messages' && voiceConfig.voiceId) {
+        playTTS(data.reply, voiceConfig.voiceId, partnerMsg.id);
+      }
+
       if (newRound >= activeScenario.minRounds) {
         setShowEndOption(true);
       }
@@ -465,6 +526,15 @@ const PracticeChat = () => {
   // --- Scenario Selection ---
   if (!scenarioId) {
     return (
+      <>
+      <VoiceSetupDialog
+        open={showVoiceSetup}
+        onClose={() => { setShowVoiceSetup(false); setPendingScenarioStart(null); }}
+        onConfirm={handleVoiceConfirm}
+        scenario={pendingScenarioStart?.override?.desc || scenarios.find(s => s.id === pendingScenarioStart?.id)?.desc || ''}
+        attachmentStyle={pendingScenarioStart?.override?.attachmentStyle || scenarios.find(s => s.id === pendingScenarioStart?.id)?.attachmentStyle || ''}
+        backstory={pendingScenarioStart?.override?.backstory || scenarios.find(s => s.id === pendingScenarioStart?.id)?.backstory || ''}
+      />
       <div className="min-h-screen gradient-calm flex items-center justify-center p-4">
         <motion.div className="w-full max-w-lg space-y-6" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <button onClick={() => navigate('/coach')} className="text-muted-foreground hover:text-foreground transition-colors">
@@ -479,7 +549,7 @@ const PracticeChat = () => {
             <button
               onClick={() => {
                 const random = getRandomScenario();
-                startScenario(random.id, random);
+                requestScenarioStart(random.id, random);
               }}
               className="w-full bg-card rounded-xl p-5 shadow-soft text-left flex items-start gap-4 hover:shadow-glow transition-shadow border-2 border-dashed border-primary/30"
             >
@@ -641,7 +711,7 @@ const PracticeChat = () => {
               return (
                 <button
                   key={s.id}
-                  onClick={() => startScenario(s.id)}
+                  onClick={() => requestScenarioStart(s.id)}
                   className="w-full bg-card rounded-xl p-5 shadow-soft text-left flex items-start gap-4 hover:shadow-glow transition-shadow"
                 >
                   <div className="w-10 h-10 rounded-lg bg-sage-light flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -658,6 +728,7 @@ const PracticeChat = () => {
           </div>
         </motion.div>
       </div>
+      </>
     );
   }
 
@@ -700,7 +771,7 @@ const PracticeChat = () => {
 
           <div className="flex gap-3">
             <button
-              onClick={() => startScenario(scenarioId!, activeScenario || undefined)}
+              onClick={() => requestScenarioStart(scenarioId!, activeScenario || undefined)}
               className="flex-1 py-3 rounded-xl bg-card border border-border text-sm font-semibold hover:bg-muted transition-colors"
             >
               Try Again
@@ -780,6 +851,20 @@ const PracticeChat = () => {
                     <span className="text-xs font-semibold block mb-1 text-primary">📖 Context</span>
                   )}
                   {msg.text}
+                  {msg.sender === 'partner' && voiceConfig.mode === 'voice-messages' && voiceConfig.voiceId && (
+                    <button
+                      onClick={() => playTTS(msg.text, voiceConfig.voiceId!, msg.id)}
+                      disabled={playingAudioId === msg.id}
+                      className="inline-flex items-center gap-1 mt-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {playingAudioId === msg.id ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : (
+                        <Volume2 className="w-3 h-3" />
+                      )}
+                      {playingAudioId === msg.id ? 'Playing...' : 'Play'}
+                    </button>
+                  )}
                 </div>
                 {msg.sender === 'user' && !grading && !grade && (
                   <button
