@@ -138,10 +138,24 @@ serve(async (req) => {
 Your responses should feel like they could have been written by the SAME person shown in these screenshots.`;
     }
 
+    // Voice description integration
+    let voiceStyleGuide = '';
+    if (voiceDescription) {
+      voiceStyleGuide = `\n\nVOICE & SPEECH PATTERN: The user has described how this person talks: "${voiceDescription}". Incorporate these speech patterns into your TEXT responses. For example:
+- If they stutter: occasionally write stuttered words like "I-I don't know" or "w-what are you talking about"
+- If they swear: include casual profanity naturally
+- If they use filler words: sprinkle in "um", "like", "you know"
+- If they mumble: use ellipses and trailing off "I guess... whatever..."
+- If they talk fast: use run-on sentences without much punctuation
+- If they're slow/deliberate: use periods and pauses between thoughts
+Make these patterns SUBTLE and REALISTIC — don't overdo it.`;
+    }
+
     const systemPrompt = `${stylePrompt}
 
 ${intensityGuide}
 ${screenshotStyleGuide}
+${voiceStyleGuide}
 
 SCENARIO: "${scenario}"
 BACKSTORY: ${backstory}
