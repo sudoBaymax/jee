@@ -1,12 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Send, Loader2, Award, MessageCircle, UserX, Heart, Briefcase, Shield, AlertTriangle, PenLine, Undo2, Mic, MicOff, Gauge, ImagePlus, X, Phone, PhoneOff } from 'lucide-react';
+import { ArrowLeft, Send, Loader2, Award, MessageCircle, UserX, Heart, Briefcase, Shield, AlertTriangle, PenLine, Undo2, Mic, MicOff, Gauge, ImagePlus, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAppState } from '@/context/AppContext';
-import VoiceSetupDialog, { VoiceConfig, VoiceMode, VoiceModeToggle, VoiceMessageButton } from '@/components/VoiceSetupDialog';
-import { useConversation } from '@elevenlabs/react';
 
 interface Message {
   id: string;
@@ -218,11 +216,6 @@ const PracticeChat = () => {
   const [intensity, setIntensity] = useState(7);
   const [isListening, setIsListening] = useState(false);
   const [screenshots, setScreenshots] = useState<string[]>([]);
-  const [voiceConfig, setVoiceConfig] = useState<VoiceConfig | null>(null);
-  const [voiceMode, setVoiceMode] = useState<VoiceMode>('text');
-  const [showVoiceSetup, setShowVoiceSetup] = useState(false);
-  const [pendingScenarioStart, setPendingScenarioStart] = useState<{ id: string; override?: Scenario } | null>(null);
-  const [inVoiceCall, setInVoiceCall] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
@@ -311,13 +304,6 @@ const PracticeChat = () => {
 
   const startScenario = (id: string, override?: Scenario) => {
     const s = override || scenarios.find(s => s.id === id)!;
-    // Show voice setup dialog before starting
-    setPendingScenarioStart({ id, override });
-    setShowVoiceSetup(true);
-  };
-
-  const actuallyStartScenario = (id: string, override?: Scenario) => {
-    const s = override || scenarios.find(s => s.id === id)!;
     setScenarioId(id);
     if (override) setCustomScenario(override);
     else setCustomScenario(null);
@@ -334,26 +320,6 @@ const PracticeChat = () => {
     ]);
   };
 
-  const handleVoiceSetupComplete = (config: VoiceConfig) => {
-    setVoiceConfig(config);
-    setVoiceMode('voice-messages');
-    setShowVoiceSetup(false);
-    if (pendingScenarioStart) {
-      actuallyStartScenario(pendingScenarioStart.id, pendingScenarioStart.override);
-      setPendingScenarioStart(null);
-    }
-  };
-
-  const handleVoiceSetupSkip = () => {
-    setVoiceConfig(null);
-    setVoiceMode('text');
-    setShowVoiceSetup(false);
-    if (pendingScenarioStart) {
-      actuallyStartScenario(pendingScenarioStart.id, pendingScenarioStart.override);
-      setPendingScenarioStart(null);
-    }
-  };
-
   const exitChat = () => {
     setScenarioId(null);
     setMessages([]);
@@ -363,9 +329,6 @@ const PracticeChat = () => {
     setShowCustomForm(false);
     setCustomPrompt('');
     setRevertToId(null);
-    setVoiceConfig(null);
-    setVoiceMode('text');
-    setInVoiceCall(false);
   };
 
   const confirmRevert = () => {
@@ -440,15 +403,14 @@ const PracticeChat = () => {
         .map(m => ({ sender: m.sender, text: m.text }));
 
       const { data, error: fnError } = await supabase.functions.invoke('practice-chat', {
-          body: {
-            scenario: activeScenario.desc || activeScenario.label,
-            attachmentStyle: activeScenario.attachmentStyle,
-            backstory: activeScenario.backstory,
-            messages: chatHistory,
-            intensity,
-            voiceDescription: voiceConfig ? `${voiceConfig.voiceDescription}. Speech quirks: ${voiceConfig.speechQuirks.join(', ')}` : undefined,
-          },
-        });
+        body: {
+          scenario: activeScenario.desc || activeScenario.label,
+          attachmentStyle: activeScenario.attachmentStyle,
+          backstory: activeScenario.backstory,
+          messages: chatHistory,
+          intensity,
+        },
+      });
 
       if (fnError) throw fnError;
       if (data?.error) {
@@ -768,7 +730,6 @@ const PracticeChat = () => {
             <p className="font-semibold text-sm">{activeScenario?.label}</p>
             <p className="text-xs text-muted-foreground">
               {activeScenario?.attachmentStyle.replace('-', ' ')} • {roundCount} exchange{roundCount !== 1 ? 's' : ''}
-              {voiceConfig && ` • 🔊 ${voiceConfig.voiceName}`}
             </p>
           </div>
           {!grading && roundCount >= 1 && (
@@ -794,23 +755,6 @@ const PracticeChat = () => {
             {intensity <= 3 ? '😌 Mild' : intensity <= 5 ? '😐 Moderate' : intensity <= 7 ? '😤 Hard' : '🔥 Intense'}
           </span>
         </div>
-        {voiceConfig && (
-          <div className="px-4 pb-3 flex items-center justify-between">
-            <VoiceModeToggle mode={voiceMode} onModeChange={setVoiceMode} disabled={grading} />
-            {voiceMode === 'voice-call' && (
-              <button
-                onClick={() => setInVoiceCall(!inVoiceCall)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-                  inVoiceCall
-                    ? 'bg-destructive text-destructive-foreground'
-                    : 'bg-primary text-primary-foreground hover:bg-primary/90'
-                }`}
-              >
-                {inVoiceCall ? <><PhoneOff className="w-3.5 h-3.5" /> End Call</> : <><Phone className="w-3.5 h-3.5" /> Start Call</>}
-              </button>
-            )}
-          </div>
-        )}
       </div>
 
       {/* Messages */}
@@ -836,9 +780,6 @@ const PracticeChat = () => {
                     <span className="text-xs font-semibold block mb-1 text-primary">📖 Context</span>
                   )}
                   {msg.text}
-                  {msg.sender === 'partner' && voiceConfig && voiceMode === 'voice-messages' && (
-                    <VoiceMessageButton text={msg.text} voiceId={voiceConfig.voiceId} />
-                  )}
                 </div>
                 {msg.sender === 'user' && !grading && !grade && (
                   <button
@@ -993,26 +934,6 @@ const PracticeChat = () => {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Voice Setup Dialog */}
-      <VoiceSetupDialog
-        open={showVoiceSetup}
-        onClose={() => {
-          setShowVoiceSetup(false);
-          setPendingScenarioStart(null);
-        }}
-        onComplete={handleVoiceSetupComplete}
-        onSkip={handleVoiceSetupSkip}
-        scenario={pendingScenarioStart ? (
-          (pendingScenarioStart.override || scenarios.find(s => s.id === pendingScenarioStart.id))?.desc || ''
-        ) : ''}
-        backstory={pendingScenarioStart ? (
-          (pendingScenarioStart.override || scenarios.find(s => s.id === pendingScenarioStart.id))?.backstory || ''
-        ) : ''}
-        attachmentStyle={pendingScenarioStart ? (
-          (pendingScenarioStart.override || scenarios.find(s => s.id === pendingScenarioStart.id))?.attachmentStyle || ''
-        ) : ''}
-      />
     </div>
   );
 };
