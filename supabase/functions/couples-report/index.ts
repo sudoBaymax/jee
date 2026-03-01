@@ -11,8 +11,8 @@ serve(async (req) => {
 
   try {
     const { messages, person1_name, person1_attachment, person2_name, person2_attachment, situation } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const GOOGLE_AI_API_KEY = Deno.env.get("GOOGLE_AI_API_KEY");
+    if (!GOOGLE_AI_API_KEY) throw new Error("GOOGLE_AI_API_KEY is not configured");
 
     const systemPrompt = `You are an expert couples therapist writing a detailed post-session report. You use Gottman Method and Emotionally Focused Therapy (EFT) frameworks.
 
