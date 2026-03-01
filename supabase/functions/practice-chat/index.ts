@@ -267,14 +267,19 @@ CRITICAL RULES:
     }
 
     const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content;
-    if (!reply) {
+    const rawReply = data.choices?.[0]?.message?.content;
+    if (!rawReply) {
       return new Response(JSON.stringify({ error: "No response from AI" }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    return new Response(JSON.stringify({ reply }), {
+    // Extract emotion tag from reply
+    const emotionMatch = rawReply.match(/\[EMOTION:\s*(happy|frown|crying|blush)\s*\]/i);
+    const emotion = emotionMatch ? emotionMatch[1].toLowerCase() : "frown";
+    const reply = rawReply.replace(/\n?\[EMOTION:\s*(?:happy|frown|crying|blush)\s*\]/gi, "").trim();
+
+    return new Response(JSON.stringify({ reply, emotion }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
