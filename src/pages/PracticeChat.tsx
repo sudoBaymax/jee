@@ -503,7 +503,49 @@ const PracticeChat = () => {
         sender: 'partner',
         text: data.reply,
       };
-      setMessages(prev => [...prev, partnerMsg]);
+      const updatedMessages = [...newMessages, partnerMsg];
+      setMessages(updatedMessages);
+
+      // Detect if the character has left/ended the conversation
+      const replyLower = data.reply.toLowerCase();
+      const leftSignals = [
+        '[no response', '[they left', '[silence', '[gone', '[left the',
+        '[door closes', '[door slams', '[walks out', '[walked out',
+        '[has left', '[end of conversation',
+      ];
+      const characterLeft = leftSignals.some(s => replyLower.includes(s));
+
+      if (characterLeft) {
+        // Auto-end and grade after a brief pause
+        setTimeout(() => {
+          setGrading(true);
+          setShowEndOption(false);
+          setError(null);
+          (async () => {
+            try {
+              const { data: gradeData, error: fnError } = await supabase.functions.invoke('grade-conversation', {
+                body: {
+                  scenario: `${activeScenario?.label}: ${activeScenario?.desc}. Backstory: ${activeScenario?.backstory}. The partner's attachment style is: ${activeScenario?.attachmentStyle}`,
+                  messages: updatedMessages
+                    .filter(m => m.sender !== 'system')
+                    .map(m => ({ sender: m.sender, text: m.text })),
+                },
+              });
+              if (fnError) throw fnError;
+              if (gradeData?.error) throw new Error(gradeData.error);
+              setGrade(gradeData as GradeResult);
+            } catch (e: any) {
+              console.error('Auto-grading failed:', e);
+              setError('Could not get AI feedback. Please try again.');
+              setShowEndOption(true);
+            } finally {
+              setGrading(false);
+            }
+          })();
+        }, 1500);
+        setLoading(false);
+        return; // Skip normal flow
+      }
 
       // Send emotion to local device
       if (data.emotion) {
