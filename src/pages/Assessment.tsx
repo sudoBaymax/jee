@@ -87,7 +87,7 @@ const Assessment = () => {
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [showResult, setShowResult] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const { setAssessment, assessment } = useAppState();
+  const { setAssessment, assessment, setCurrentStage } = useAppState();
   const navigate = useNavigate();
 
   const answer = async (val: number) => {
@@ -255,7 +255,10 @@ const Assessment = () => {
           )}
 
           <button
-            onClick={() => navigate('/coach')}
+            onClick={() => {
+              setCurrentStage(3);
+              navigate('/register');
+            }}
             className="w-full px-6 py-3.5 rounded-xl gradient-hero text-primary-foreground font-semibold shadow-glow hover:opacity-90 transition-opacity"
           >
             Start Your Coaching Plan <ChevronRight className="inline w-4 h-4 ml-1" />
