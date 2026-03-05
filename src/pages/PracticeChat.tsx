@@ -5,6 +5,7 @@ import { ArrowLeft, Send, Loader2, Award, MessageCircle, UserX, Heart, Briefcase
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAppState } from '@/context/AppContext';
+import { saveConflictScore } from '@/lib/saveConflictScore';
 import VoiceSetupDialog, { VoiceConfig } from '@/components/VoiceSetupDialog';
 import VoiceMicButton from '@/components/VoiceMicButton';
 
@@ -207,7 +208,7 @@ const PracticeChat = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const navigate = useNavigate();
-  const { setChatActive } = useAppState();
+  const { setChatActive, appUserId } = useAppState();
 
   const [customScenario, setCustomScenario] = useState<Scenario | null>(null);
   const [showCustomForm, setShowCustomForm] = useState(false);
@@ -534,6 +535,7 @@ const PracticeChat = () => {
               if (fnError) throw fnError;
               if (gradeData?.error) throw new Error(gradeData.error);
               setGrade(gradeData as GradeResult);
+              saveConflictScore(appUserId, gradeData as GradeResult);
             } catch (e: any) {
               console.error('Auto-grading failed:', e);
               setError('Could not get AI feedback. Please try again.');
@@ -593,6 +595,7 @@ const PracticeChat = () => {
       if (fnError) throw fnError;
       if (data?.error) throw new Error(data.error);
       setGrade(data as GradeResult);
+      saveConflictScore(appUserId, data as GradeResult);
     } catch (e: any) {
       console.error('Grading failed:', e);
       setError('Could not get AI feedback. Please try again.');

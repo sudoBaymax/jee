@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_users: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      app_users: {
+        Row: {
+          attachment_lean: string | null
+          attachment_scores: Json | null
+          conflict_grade: string | null
+          conflict_summary: string | null
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          updated_at: string
+        }
+        Insert: {
+          attachment_lean?: string | null
+          attachment_scores?: Json | null
+          conflict_grade?: string | null
+          conflict_summary?: string | null
+          created_at?: string
+          email: string
+          first_name: string
+          id?: string
+          last_name: string
+          updated_at?: string
+        }
+        Update: {
+          attachment_lean?: string | null
+          attachment_scores?: Json | null
+          conflict_grade?: string | null
+          conflict_summary?: string | null
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       couples_messages: {
         Row: {
           content: string
