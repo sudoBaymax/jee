@@ -20,7 +20,7 @@ const EmailGate = () => {
 
     setSaving(true);
     try {
-      const { data, error } = await supabase.from('app_users').insert({
+      const { error } = await supabase.from('app_users').insert({
         first_name: firstName.trim(),
         last_name: lastName.trim(),
         email: email.trim().toLowerCase(),
@@ -31,10 +31,9 @@ const EmailGate = () => {
           avoidant: assessment.avoidant,
           fearfulAvoidant: assessment.fearfulAvoidant,
         } : null,
-      }).select('id').single();
+      });
 
       if (error) throw error;
-      if (data) setAppUserId(data.id);
       toast.success('Welcome! Your coaching plan is ready.');
       navigate('/coach');
     } catch (err) {
