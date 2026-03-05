@@ -208,7 +208,7 @@ const PracticeChat = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const navigate = useNavigate();
-  const { setChatActive } = useAppState();
+  const { setChatActive, appUserId } = useAppState();
 
   const [customScenario, setCustomScenario] = useState<Scenario | null>(null);
   const [showCustomForm, setShowCustomForm] = useState(false);
