@@ -16,7 +16,6 @@ import CouplesReport from "./pages/CouplesReport";
 import Admin from "./pages/Admin";
 import BottomNav from "./components/BottomNav";
 import NotFound from "./pages/NotFound";
-import AuthGuard from "./components/AuthGuard";
 
 const queryClient = new QueryClient();
 
@@ -34,9 +33,9 @@ const App = () => (
             <Route path="/register" element={<EmailGate />} />
             <Route path="/coach" element={<CoachingPlan />} />
             <Route path="/practice" element={<PracticeChat />} />
-            <Route path="/couples" element={<AuthGuard><CouplesSetup /></AuthGuard>} />
-            <Route path="/couples/chat/:code" element={<AuthGuard><CouplesChat /></AuthGuard>} />
-            <Route path="/couples/report/:code" element={<AuthGuard><CouplesReport /></AuthGuard>} />
+            <Route path="/couples" element={<CouplesSetup />} />
+            <Route path="/couples/chat/:code" element={<CouplesChat />} />
+            <Route path="/couples/report/:code" element={<CouplesReport />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
