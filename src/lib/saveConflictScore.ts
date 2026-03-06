@@ -11,14 +11,13 @@ interface GradeResult {
 export const saveConflictScore = async (appUserId: string | null, grade: GradeResult) => {
   if (!appUserId) return;
   try {
-    await supabase
-      .from('app_users')
-      .update({
-        conflict_grade: grade.overallGrade,
-        conflict_summary: grade.summary,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', appUserId);
+    await supabase.functions.invoke('update-conflict-score', {
+      body: {
+        appUserId,
+        overallGrade: grade.overallGrade,
+        summary: grade.summary,
+      },
+    });
   } catch (err) {
     console.error('Failed to save conflict score:', err);
   }
