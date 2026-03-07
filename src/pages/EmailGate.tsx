@@ -34,8 +34,8 @@ const EmailGate = () => {
       });
 
       if (error) throw error;
-      toast.success('Welcome! Your coaching plan is ready.');
-      navigate('/coach');
+      toast.success("Great! Now let's discover your attachment style.");
+      navigate('/assessment');
     } catch (err) {
       console.error('Error saving user:', err);
       toast.error('Something went wrong. Please try again.');
@@ -56,9 +56,9 @@ const EmailGate = () => {
           <div className="w-16 h-16 rounded-full gradient-hero mx-auto flex items-center justify-center shadow-glow">
             <Mail className="w-7 h-7 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-bold">Before we start...</h1>
+          <h1 className="text-2xl font-bold">Almost there!</h1>
           <p className="text-muted-foreground text-sm leading-relaxed">
-            Enter your name and email to unlock your personalized coaching plan. We'll save your attachment results so you can reference them later.
+            Enter your name and email so we can save your results and build your personalized coaching plan.
           </p>
         </div>
 
