@@ -264,7 +264,14 @@ const PracticeChat = () => {
   }, [showCustomForm, addScreenshot]);
 
   useEffect(() => {
-    document.addEventListener('paste', handlePaste);
+  // Auto-open custom form if ?custom=1
+  useEffect(() => {
+    if (searchParams.get('custom') === '1' && !scenarioId) {
+      setShowCustomForm(true);
+    }
+  }, [searchParams, scenarioId]);
+
+  document.addEventListener('paste', handlePaste);
     return () => document.removeEventListener('paste', handlePaste);
   }, [handlePaste]);
 
