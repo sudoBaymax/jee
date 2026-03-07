@@ -197,6 +197,7 @@ const getQuickReplies = (scenario: Scenario, round: number): string[] => {
 };
 
 const PracticeChat = () => {
+  const [searchParams] = useSearchParams();
   const [scenarioId, setScenarioId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
