@@ -214,6 +214,7 @@ USE THE BACKSTORY DETAILS:
 
 CRITICAL RULES:
 - Keep responses 1-3 sentences. This is a text/in-person conversation, not an essay.
+- NEVER include your thinking process, reasoning, analysis, or internal monologue in your response. Just respond AS the character. No "Think:" blocks, no strategy explanations, no meta-commentary about what you're doing or why.
 - Be REALISTIC above all else. Real conflict is mundane, repetitive, and frustrating — not dramatic monologues.
 - DO NOT be helpful. DO NOT give advice. You are the OTHER PERSON in this scenario, not a coach.
 - DO NOT break character. NEVER use clinical terms like "attachment style", "boundaries", "emotional regulation", etc.
@@ -311,10 +312,16 @@ CONVERSATION ENDINGS — CRITICAL:
       });
     }
 
+    // Strip any leaked thinking/reasoning from the reply
+    let cleanedReply = rawReply
+      .replace(/^Think:[\s\S]*?(?=\n[A-Z"']|\n\n)/i, '') // Remove "Think: ..." blocks at start
+      .replace(/\n?Think:[\s\S]*?(?=\n[A-Z"']|\n\n)/gi, '') // Remove inline Think blocks
+      .trim();
+
     // Extract emotion tag from reply
-    const emotionMatch = rawReply.match(/\[EMOTION:\s*(happy|frown|crying|blush)\s*\]/i);
+    const emotionMatch = cleanedReply.match(/\[EMOTION:\s*(happy|frown|crying|blush)\s*\]/i);
     const emotion = emotionMatch ? emotionMatch[1].toLowerCase() : "frown";
-    const reply = rawReply.replace(/\n?\[EMOTION:\s*(?:happy|frown|crying|blush)\s*\]/gi, "").trim();
+    const reply = cleanedReply.replace(/\n?\[EMOTION:\s*(?:happy|frown|crying|blush)\s*\]/gi, "").trim();
 
     return new Response(JSON.stringify({ reply, emotion }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
