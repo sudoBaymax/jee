@@ -247,7 +247,7 @@ const Assessment = () => {
           <button
             onClick={() => {
               setCurrentStage(3);
-              navigate('/register');
+              navigate('/coach');
             }}
             className="w-full px-6 py-3.5 rounded-xl gradient-hero text-primary-foreground font-semibold shadow-glow hover:opacity-90 transition-opacity"
           >
