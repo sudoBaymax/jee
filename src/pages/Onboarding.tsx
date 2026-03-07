@@ -33,7 +33,7 @@ const Onboarding = () => {
 
   const finish = () => {
     setProfile({ goals: selectedGoals, context: selectedContext, privacyMode, onboardingComplete: true });
-    navigate('/assessment');
+    navigate('/register');
   };
 
   const canNext = step === 0 ? agreed : step === 1 ? selectedGoals.length > 0 : step === 2 ? !!selectedContext : true;
@@ -176,7 +176,7 @@ const Onboarding = () => {
             disabled={!canNext}
             className="flex-1 px-6 py-3 rounded-xl gradient-hero text-primary-foreground font-semibold shadow-glow hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {step < 3 ? 'Continue' : 'Start Assessment'}
+            {step < 3 ? 'Continue' : 'Continue'}
           </button>
         </div>
       </motion.div>

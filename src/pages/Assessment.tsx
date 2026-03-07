@@ -5,32 +5,22 @@ import { useAppState } from '@/context/AppContext';
 import { ChevronRight, ArrowLeft, Loader2, Sparkles, TrendingUp, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
-// ECR-R inspired items — 10 Anxiety, 10 Avoidance
+// ECR-R Short Form — 5 Anxiety, 5 Avoidance (highest-loading items)
 // Items marked reverse:true are reverse-coded (7 becomes 1, etc.)
 const questions = [
-  // Anxiety subscale (1–10)
+  // Anxiety subscale (1–5)
   { id: 1, text: "I worry about being abandoned by people close to me.", subscale: 'anxiety', reverse: false },
-  { id: 2, text: "I feel confident that my partner really loves me.", subscale: 'anxiety', reverse: true },
-  { id: 3, text: "I need a lot of reassurance that I am loved.", subscale: 'anxiety', reverse: false },
-  { id: 4, text: "I often worry that my partner doesn't really care about me.", subscale: 'anxiety', reverse: false },
-  { id: 5, text: "I rarely worry about being left behind.", subscale: 'anxiety', reverse: true },
-  { id: 6, text: "When I can't reach my partner, I imagine the worst.", subscale: 'anxiety', reverse: false },
-  { id: 7, text: "I get upset when my partner doesn't respond quickly.", subscale: 'anxiety', reverse: false },
-  { id: 8, text: "I feel secure in my close relationships.", subscale: 'anxiety', reverse: true },
-  { id: 9, text: "I'm afraid that once someone gets to know me, they won't like me.", subscale: 'anxiety', reverse: false },
-  { id: 10, text: "My desire to be very close sometimes scares people away.", subscale: 'anxiety', reverse: false },
+  { id: 2, text: "I need a lot of reassurance that I am loved.", subscale: 'anxiety', reverse: false },
+  { id: 3, text: "I often worry that my partner doesn't really care about me.", subscale: 'anxiety', reverse: false },
+  { id: 4, text: "When I can't reach my partner, I imagine the worst.", subscale: 'anxiety', reverse: false },
+  { id: 5, text: "I'm afraid that once someone gets to know me, they won't like me.", subscale: 'anxiety', reverse: false },
 
-  // Avoidance subscale (11–20)
-  { id: 11, text: "I prefer not to show others how I feel deep down.", subscale: 'avoidance', reverse: false },
-  { id: 12, text: "I find it easy to depend on close others.", subscale: 'avoidance', reverse: true },
-  { id: 13, text: "I get uncomfortable when someone wants to be very close.", subscale: 'avoidance', reverse: false },
-  { id: 14, text: "I am comfortable sharing my private thoughts and feelings.", subscale: 'avoidance', reverse: true },
-  { id: 15, text: "I find it difficult to allow myself to depend on others.", subscale: 'avoidance', reverse: false },
-  { id: 16, text: "I value my independence more than my relationships.", subscale: 'avoidance', reverse: false },
-  { id: 17, text: "I turn to my partner for comfort when I'm upset.", subscale: 'avoidance', reverse: true },
-  { id: 18, text: "I don't feel comfortable opening up to others.", subscale: 'avoidance', reverse: false },
-  { id: 19, text: "I feel comfortable being emotionally close to others.", subscale: 'avoidance', reverse: true },
-  { id: 20, text: "I try to avoid getting too close to my partner.", subscale: 'avoidance', reverse: false },
+  // Avoidance subscale (6–10)
+  { id: 6, text: "I prefer not to show others how I feel deep down.", subscale: 'avoidance', reverse: false },
+  { id: 7, text: "I get uncomfortable when someone wants to be very close.", subscale: 'avoidance', reverse: false },
+  { id: 8, text: "I find it difficult to allow myself to depend on others.", subscale: 'avoidance', reverse: false },
+  { id: 9, text: "I don't feel comfortable opening up to others.", subscale: 'avoidance', reverse: false },
+  { id: 10, text: "I try to avoid getting too close to my partner.", subscale: 'avoidance', reverse: false },
 ];
 
 const likertLabels = [
@@ -72,9 +62,9 @@ function scoreAnswers(answers: Record<number, number>) {
 }
 
 function classify(anxiety: number, avoidance: number) {
-  // Median on a 1-7 scale across 10 items = 40
-  const anxHigh = anxiety > 40;
-  const avoHigh = avoidance > 40;
+  // Median on a 1-7 scale across 5 items = 20
+  const anxHigh = anxiety > 20;
+  const avoHigh = avoidance > 20;
 
   if (!anxHigh && !avoHigh) return 'Secure';
   if (anxHigh && !avoHigh) return 'Anxious-Preoccupied';
@@ -103,10 +93,10 @@ const Assessment = () => {
     const scores = scoreAnswers(next);
     const lean = classify(scores.anxiety, scores.avoidance);
     const total = scores.anxiety + scores.avoidance;
-    const anxPct = Math.round((scores.anxiety / 70) * 100);
-    const avoPct = Math.round((scores.avoidance / 70) * 100);
-    const securePct = Math.max(0, 100 - Math.round(((scores.anxiety + scores.avoidance) / 140) * 100));
-    const fearfulPct = lean === 'Fearful-Avoidant' ? Math.round(((scores.anxiety + scores.avoidance) / 140) * 100) : 0;
+    const anxPct = Math.round((scores.anxiety / 35) * 100);
+    const avoPct = Math.round((scores.avoidance / 35) * 100);
+    const securePct = Math.max(0, 100 - Math.round(((scores.anxiety + scores.avoidance) / 70) * 100));
+    const fearfulPct = lean === 'Fearful-Avoidant' ? Math.round(((scores.anxiety + scores.avoidance) / 70) * 100) : 0;
 
     const baseResult = {
       secure: securePct,
