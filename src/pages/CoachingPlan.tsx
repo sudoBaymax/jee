@@ -117,6 +117,30 @@ const CoachingPlan = () => {
           )}
         </div>
 
+        {/* Create Your Own promo */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          onClick={() => navigate('/practice?custom=1')}
+          className="relative overflow-hidden rounded-xl p-5 cursor-pointer hover:scale-[1.02] transition-transform"
+          style={{ background: 'linear-gradient(135deg, hsl(var(--primary) / 0.15), hsl(var(--accent) / 0.2))' }}
+        >
+          <div className="absolute top-2 right-3 text-3xl opacity-40">✍️</div>
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
+              <Sparkles className="w-5 h-5 text-primary" />
+            </div>
+            <div className="flex-1">
+              <p className="font-bold text-sm">Practicing for a real conversation?</p>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                Describe your exact situation — the AI becomes that person. Upload screenshots of their texts and it'll mimic their style.
+              </p>
+              <span className="inline-block mt-2 text-xs font-semibold text-primary">Create Your Own →</span>
+            </div>
+          </div>
+        </motion.div>
+
         <button
           onClick={() => navigate('/practice')}
           className="w-full px-6 py-3.5 rounded-xl gradient-warm text-primary-foreground font-semibold shadow-warm hover:opacity-90 transition-opacity"

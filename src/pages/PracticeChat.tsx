@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Send, Loader2, Award, MessageCircle, UserX, Heart, Briefcase, Shield, AlertTriangle, PenLine, Undo2, Mic, MicOff, Gauge, ImagePlus, X, Volume2 } from 'lucide-react';
@@ -196,6 +197,7 @@ const getQuickReplies = (scenario: Scenario, round: number): string[] => {
 };
 
 const PracticeChat = () => {
+  const [searchParams] = useSearchParams();
   const [scenarioId, setScenarioId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -262,7 +264,14 @@ const PracticeChat = () => {
   }, [showCustomForm, addScreenshot]);
 
   useEffect(() => {
-    document.addEventListener('paste', handlePaste);
+  // Auto-open custom form if ?custom=1
+  useEffect(() => {
+    if (searchParams.get('custom') === '1' && !scenarioId) {
+      setShowCustomForm(true);
+    }
+  }, [searchParams, scenarioId]);
+
+  document.addEventListener('paste', handlePaste);
     return () => document.removeEventListener('paste', handlePaste);
   }, [handlePaste]);
 
