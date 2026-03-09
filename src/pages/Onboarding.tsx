@@ -13,9 +13,12 @@ const goals = [
 
 const contexts = [
   { id: 'dating', label: 'Dating', icon: Heart },
+  { id: 'relationship', label: 'Current relationship', icon: Heart },
   { id: 'ex', label: 'Ex / Past relationship', icon: UserX },
+  { id: 'friends', label: 'Friendships', icon: Users },
   { id: 'family', label: 'Family', icon: Users },
   { id: 'work', label: 'Work / Business', icon: Briefcase },
+  { id: 'self', label: 'Self-growth', icon: Brain },
 ];
 
 const Onboarding = () => {

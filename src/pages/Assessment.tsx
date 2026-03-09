@@ -5,23 +5,63 @@ import { useAppState } from '@/context/AppContext';
 import { ChevronRight, ArrowLeft, Loader2, Sparkles, TrendingUp, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
-// ECR-R Short Form — 5 Anxiety, 5 Avoidance (highest-loading items)
-// Items marked reverse:true are reverse-coded (7 becomes 1, etc.)
-const questions = [
-  // Anxiety subscale (1–5)
-  { id: 1, text: "I worry about being abandoned by people close to me.", subscale: 'anxiety', reverse: false },
-  { id: 2, text: "I need a lot of reassurance that I am loved.", subscale: 'anxiety', reverse: false },
-  { id: 3, text: "I often worry that my partner doesn't really care about me.", subscale: 'anxiety', reverse: false },
-  { id: 4, text: "When I can't reach my partner, I imagine the worst.", subscale: 'anxiety', reverse: false },
-  { id: 5, text: "I'm afraid that once someone gets to know me, they won't like me.", subscale: 'anxiety', reverse: false },
+// Context-adaptive question sets
+// "romantic" contexts use partner language, others use relational language
+type ContextGroup = 'romantic' | 'general';
 
-  // Avoidance subscale (6–10)
-  { id: 6, text: "I prefer not to show others how I feel deep down.", subscale: 'avoidance', reverse: false },
-  { id: 7, text: "I get uncomfortable when someone wants to be very close.", subscale: 'avoidance', reverse: false },
-  { id: 8, text: "I find it difficult to allow myself to depend on others.", subscale: 'avoidance', reverse: false },
-  { id: 9, text: "I don't feel comfortable opening up to others.", subscale: 'avoidance', reverse: false },
-  { id: 10, text: "I try to avoid getting too close to my partner.", subscale: 'avoidance', reverse: false },
-];
+const contextGroupMap: Record<string, ContextGroup> = {
+  dating: 'romantic',
+  relationship: 'romantic',
+  ex: 'romantic',
+  friends: 'general',
+  family: 'general',
+  work: 'general',
+  self: 'general',
+};
+
+const contextLabels: Record<string, string> = {
+  friends: 'close friends',
+  family: 'family members',
+  work: 'colleagues',
+  self: 'people close to you',
+  dating: 'partner',
+  relationship: 'partner',
+  ex: 'partner',
+};
+
+function getQuestions(context: string) {
+  const group = contextGroupMap[context] || 'general';
+  const person = contextLabels[context] || 'people close to you';
+
+  if (group === 'romantic') {
+    return [
+      { id: 1, text: "I worry about being abandoned by my partner.", subscale: 'anxiety', reverse: false },
+      { id: 2, text: "I need a lot of reassurance that I am loved by my partner.", subscale: 'anxiety', reverse: false },
+      { id: 3, text: "I often worry that my partner doesn't really care about me.", subscale: 'anxiety', reverse: false },
+      { id: 4, text: "When I can't reach my partner, I imagine the worst.", subscale: 'anxiety', reverse: false },
+      { id: 5, text: "I'm afraid that once my partner truly gets to know me, they won't like me.", subscale: 'anxiety', reverse: false },
+      { id: 6, text: "I prefer not to show my partner how I feel deep down.", subscale: 'avoidance', reverse: false },
+      { id: 7, text: "I get uncomfortable when my partner wants to be very close.", subscale: 'avoidance', reverse: false },
+      { id: 8, text: "I find it difficult to allow myself to depend on my partner.", subscale: 'avoidance', reverse: false },
+      { id: 9, text: "I don't feel comfortable opening up to my partner.", subscale: 'avoidance', reverse: false },
+      { id: 10, text: "I try to avoid getting too close to my partner.", subscale: 'avoidance', reverse: false },
+    ];
+  }
+
+  // General / non-romantic — adapted language
+  return [
+    { id: 1, text: `I worry about being left out or dropped by ${person}.`, subscale: 'anxiety', reverse: false },
+    { id: 2, text: `I need a lot of reassurance that ${person} actually value me.`, subscale: 'anxiety', reverse: false },
+    { id: 3, text: `I often worry that ${person} don't really care about me.`, subscale: 'anxiety', reverse: false },
+    { id: 4, text: `When ${person} don't respond quickly, I imagine the worst.`, subscale: 'anxiety', reverse: false },
+    { id: 5, text: `I'm afraid that once ${person} truly get to know me, they won't like me.`, subscale: 'anxiety', reverse: false },
+    { id: 6, text: `I prefer not to show ${person} how I feel deep down.`, subscale: 'avoidance', reverse: false },
+    { id: 7, text: `I get uncomfortable when ${person} want to be very close.`, subscale: 'avoidance', reverse: false },
+    { id: 8, text: `I find it difficult to allow myself to depend on ${person}.`, subscale: 'avoidance', reverse: false },
+    { id: 9, text: `I don't feel comfortable opening up to ${person}.`, subscale: 'avoidance', reverse: false },
+    { id: 10, text: `I try to avoid getting too close to ${person}.`, subscale: 'avoidance', reverse: false },
+  ];
+}
 
 const likertLabels = [
   'Strongly Disagree',
@@ -47,12 +87,12 @@ const fallbackPatterns: Record<string, string[]> = {
   'Secure': ['Comfortable with interdependence', 'Effective conflict resolution', 'Clear emotional communication'],
 };
 
-function scoreAnswers(answers: Record<number, number>) {
+function scoreAnswers(answers: Record<number, number>, questions: ReturnType<typeof getQuestions>) {
   let anxiety = 0;
   let avoidance = 0;
 
   questions.forEach(q => {
-    const raw = answers[q.id] || 4; // default to neutral
+    const raw = answers[q.id] || 4;
     const scored = q.reverse ? (8 - raw) : raw;
     if (q.subscale === 'anxiety') anxiety += scored;
     else avoidance += scored;
@@ -62,7 +102,6 @@ function scoreAnswers(answers: Record<number, number>) {
 }
 
 function classify(anxiety: number, avoidance: number) {
-  // Median on a 1-7 scale across 5 items = 20
   const anxHigh = anxiety > 20;
   const avoHigh = avoidance > 20;
 
@@ -77,8 +116,10 @@ const Assessment = () => {
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [showResult, setShowResult] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const { setAssessment, assessment, setCurrentStage } = useAppState();
+  const { setAssessment, assessment, setCurrentStage, profile } = useAppState();
   const navigate = useNavigate();
+
+  const questions = getQuestions(profile.context);
 
   const answer = async (val: number) => {
     const next = { ...answers, [questions[currentQ].id]: val };
@@ -89,10 +130,8 @@ const Assessment = () => {
       return;
     }
 
-    // All questions answered — score
-    const scores = scoreAnswers(next);
+    const scores = scoreAnswers(next, questions);
     const lean = classify(scores.anxiety, scores.avoidance);
-    const total = scores.anxiety + scores.avoidance;
     const anxPct = Math.round((scores.anxiety / 35) * 100);
     const avoPct = Math.round((scores.avoidance / 35) * 100);
     const securePct = Math.max(0, 100 - Math.round(((scores.anxiety + scores.avoidance) / 70) * 100));
@@ -113,10 +152,9 @@ const Assessment = () => {
     setShowResult(true);
     setIsAnalyzing(true);
 
-    // Call AI for deeper analysis
     try {
       const { data, error } = await supabase.functions.invoke('assess', {
-        body: { answers: next, scores, lean },
+        body: { answers: next, scores, lean, context: profile.context },
       });
 
       if (error) throw error;
