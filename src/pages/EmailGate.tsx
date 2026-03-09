@@ -56,9 +56,9 @@ const EmailGate = () => {
           <div className="w-16 h-16 rounded-full gradient-hero mx-auto flex items-center justify-center shadow-glow">
             <Mail className="w-7 h-7 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-bold">Almost there!</h1>
+          <h1 className="text-2xl font-bold">Unlock Your Full Report</h1>
           <p className="text-muted-foreground text-sm leading-relaxed">
-            Enter your name and email so we can save your results and build your personalized coaching plan.
+            Your grade and detailed feedback are ready! Enter your name and email to unlock the full scientific report and your personalized 14-day coaching plan.
           </p>
         </div>
 
