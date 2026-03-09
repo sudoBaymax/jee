@@ -112,7 +112,7 @@ const EmailGate = () => {
           </div>
 
           <p className="text-xs text-muted-foreground">
-            We only store your name, email, and assessment results. Your conversations are never saved.
+            100% free, no paywall. We just need your email to send you the advice. Your conversations are never saved.
           </p>
 
           <button
