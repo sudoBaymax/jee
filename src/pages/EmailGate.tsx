@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAppState } from '@/context/AppContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Mail, User, ChevronRight, Loader2 } from 'lucide-react';
+import { Mail, ChevronRight, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const EmailGate = () => {
