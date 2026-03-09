@@ -285,11 +285,11 @@ const Assessment = () => {
           <button
             onClick={() => {
               setCurrentStage(3);
-              navigate('/coach');
+              navigate('/practice');
             }}
             className="w-full px-6 py-3.5 rounded-xl gradient-hero text-primary-foreground font-semibold shadow-glow hover:opacity-90 transition-opacity"
           >
-            Start Your Coaching Plan <ChevronRight className="inline w-4 h-4 ml-1" />
+            Practice a Conversation <ChevronRight className="inline w-4 h-4 ml-1" />
           </button>
         </motion.div>
       </div>

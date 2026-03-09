@@ -34,8 +34,8 @@ const EmailGate = () => {
       });
 
       if (error) throw error;
-      toast.success("Great! Now let's discover your attachment style.");
-      navigate('/assessment');
+      toast.success("Report unlocked! Here's your coaching plan.");
+      navigate('/coach');
     } catch (err) {
       console.error('Error saving user:', err);
       toast.error('Something went wrong. Please try again.');
