@@ -8,7 +8,6 @@ import { toast } from 'sonner';
 
 const EmailGate = () => {
   const [email, setEmail] = useState('');
-  const [email, setEmail] = useState('');
   const [saving, setSaving] = useState(false);
   const { assessment, setAppUserId } = useAppState();
   const navigate = useNavigate();
