@@ -20,8 +20,8 @@ const EmailGate = () => {
     setSaving(true);
     try {
       const { error } = await supabase.from('app_users').insert({
-        first_name: firstName.trim(),
-        last_name: lastName.trim(),
+        first_name: '',
+        last_name: '',
         email: email.trim().toLowerCase(),
         attachment_lean: assessment?.lean || null,
         attachment_scores: assessment ? {
