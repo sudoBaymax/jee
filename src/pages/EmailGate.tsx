@@ -80,8 +80,8 @@ const EmailGate = () => {
             </div>
           </div>
 
-          <p className="text-xs text-muted-foreground">
-            100% free, no paywall. We just need your email to send you the advice. Your conversations are never saved.
+          <p className="text-sm text-muted-foreground font-medium">
+            100% free, no paywall. We just need your email to send you the advice.
           </p>
 
           <button
