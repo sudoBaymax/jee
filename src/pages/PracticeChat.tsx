@@ -853,13 +853,13 @@ const PracticeChat = () => {
             {!isRegistered && (
               <div className="absolute inset-0 z-10 backdrop-blur-md bg-background/40 rounded-xl flex flex-col items-center justify-center gap-3 p-6">
                 <Lock className="w-8 h-8 text-primary" />
-                <p className="text-sm font-semibold text-center">Your detailed feedback is ready</p>
-                <p className="text-xs text-muted-foreground text-center">Enter your name & email to unlock the full report and your personalized 14-day coaching plan.</p>
+                <p className="text-sm font-semibold text-center">Want free advice from real therapists?</p>
+                <p className="text-xs text-muted-foreground text-center">Drop your email and we'll send you personalized tips for your attachment style — totally free.</p>
                 <button
                   onClick={() => navigate('/register')}
                   className="mt-2 px-6 py-3 rounded-xl gradient-hero text-primary-foreground font-semibold shadow-glow hover:opacity-90 transition-opacity"
                 >
-                  Unlock Full Report
+                  Send Me the Tips
                 </button>
               </div>
             )}
