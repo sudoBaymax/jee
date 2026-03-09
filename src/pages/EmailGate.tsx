@@ -64,36 +64,6 @@ const EmailGate = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium text-muted-foreground">First Name</label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input
-                  type="text"
-                  value={firstName}
-                  onChange={e => setFirstName(e.target.value)}
-                  placeholder="Jane"
-                  className="w-full pl-9 pr-3 py-3 rounded-xl border-2 border-border bg-card text-sm focus:border-primary focus:outline-none transition-colors"
-                  required
-                  maxLength={50}
-                />
-              </div>
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium text-muted-foreground">Last Name</label>
-              <input
-                type="text"
-                value={lastName}
-                onChange={e => setLastName(e.target.value)}
-                placeholder="Doe"
-                className="w-full px-3 py-3 rounded-xl border-2 border-border bg-card text-sm focus:border-primary focus:outline-none transition-colors"
-                required
-                maxLength={50}
-              />
-            </div>
-          </div>
-
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-muted-foreground">Email</label>
             <div className="relative">
