@@ -34,8 +34,8 @@ const EmailGate = () => {
       });
 
       if (error) throw error;
-      toast.success("Great! Now let's discover your attachment style.");
-      navigate('/assessment');
+      toast.success("Report unlocked! Here's your coaching plan.");
+      navigate('/coach');
     } catch (err) {
       console.error('Error saving user:', err);
       toast.error('Something went wrong. Please try again.');
@@ -56,9 +56,9 @@ const EmailGate = () => {
           <div className="w-16 h-16 rounded-full gradient-hero mx-auto flex items-center justify-center shadow-glow">
             <Mail className="w-7 h-7 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-bold">Almost there!</h1>
+          <h1 className="text-2xl font-bold">Unlock Your Full Report</h1>
           <p className="text-muted-foreground text-sm leading-relaxed">
-            Enter your name and email so we can save your results and build your personalized coaching plan.
+            Your grade and detailed feedback are ready! Enter your name and email to unlock the full scientific report and your personalized 14-day coaching plan.
           </p>
         </div>
 
@@ -121,7 +121,7 @@ const EmailGate = () => {
             {saving ? (
               <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</>
             ) : (
-              <>Unlock Coaching Plan <ChevronRight className="w-4 h-4" /></>
+              <>Unlock Full Report <ChevronRight className="w-4 h-4" /></>
             )}
           </button>
         </form>

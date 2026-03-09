@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Send, Loader2, Award, MessageCircle, UserX, Heart, Briefcase, Shield, AlertTriangle, PenLine, Undo2, Mic, MicOff, Gauge, ImagePlus, X, Volume2 } from 'lucide-react';
+import { ArrowLeft, Send, Loader2, Award, MessageCircle, UserX, Heart, Briefcase, Shield, AlertTriangle, PenLine, Undo2, Mic, MicOff, Gauge, ImagePlus, X, Volume2, Lock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAppState } from '@/context/AppContext';
@@ -830,9 +830,10 @@ const PracticeChat = () => {
     );
   }
 
-  // --- Grade Result ---
+  // --- Grade Result (blurred if not registered) ---
   if (grade) {
     const gradeColor = grade.overallGrade.startsWith('A') ? 'text-green-500' : grade.overallGrade.startsWith('B') ? 'text-primary' : 'text-orange-500';
+    const isRegistered = !!appUserId;
     return (
       <>
       {voiceSetupDialogElement}
@@ -843,46 +844,74 @@ const PracticeChat = () => {
               <Award className="w-8 h-8 text-primary" />
             </div>
             <p className={`text-5xl font-black ${gradeColor}`}>{grade.overallGrade}</p>
-            <p className="text-muted-foreground text-sm max-w-md mx-auto">{grade.summary}</p>
+            <p className="text-muted-foreground text-sm max-w-md mx-auto">
+              {isRegistered ? grade.summary : 'Analysis complete! Unlock your full report below.'}
+            </p>
           </div>
 
-          <div className="bg-card rounded-xl p-5 shadow-soft space-y-4">
-            <div>
-              <h3 className="font-semibold text-sm text-green-600 mb-2">✅ Strengths</h3>
-              <ul className="space-y-1.5">
-                {grade.strengths.map((s, i) => (
-                  <li key={i} className="text-sm text-muted-foreground">• {s}</li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold text-sm text-orange-500 mb-2">💡 Areas to Improve</h3>
-              <ul className="space-y-1.5">
-                {grade.improvements.map((s, i) => (
-                  <li key={i} className="text-sm text-muted-foreground">• {s}</li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold text-sm text-primary mb-2">✍️ Better Way to Say It</h3>
-              <p className="text-sm text-foreground bg-muted rounded-lg p-3 italic">"{grade.rewriteExample}"</p>
+          <div className="relative">
+            {!isRegistered && (
+              <div className="absolute inset-0 z-10 backdrop-blur-md bg-background/40 rounded-xl flex flex-col items-center justify-center gap-3 p-6">
+                <Lock className="w-8 h-8 text-primary" />
+                <p className="text-sm font-semibold text-center">Your detailed feedback is ready</p>
+                <p className="text-xs text-muted-foreground text-center">Enter your name & email to unlock the full report and your personalized 14-day coaching plan.</p>
+                <button
+                  onClick={() => navigate('/register')}
+                  className="mt-2 px-6 py-3 rounded-xl gradient-hero text-primary-foreground font-semibold shadow-glow hover:opacity-90 transition-opacity"
+                >
+                  Unlock Full Report
+                </button>
+              </div>
+            )}
+            <div className={!isRegistered ? 'select-none' : ''}>
+              <div className="bg-card rounded-xl p-5 shadow-soft space-y-4">
+                <div>
+                  <h3 className="font-semibold text-sm text-green-600 mb-2">✅ Strengths</h3>
+                  <ul className="space-y-1.5">
+                    {grade.strengths.map((s, i) => (
+                      <li key={i} className="text-sm text-muted-foreground">• {s}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-sm text-orange-500 mb-2">💡 Areas to Improve</h3>
+                  <ul className="space-y-1.5">
+                    {grade.improvements.map((s, i) => (
+                      <li key={i} className="text-sm text-muted-foreground">• {s}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-sm text-primary mb-2">✍️ Better Way to Say It</h3>
+                  <p className="text-sm text-foreground bg-muted rounded-lg p-3 italic">"{grade.rewriteExample}"</p>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="flex gap-3">
+          {isRegistered ? (
+            <div className="flex gap-3">
+              <button
+                onClick={() => requestScenarioStart(scenarioId!, activeScenario || undefined)}
+                className="flex-1 py-3 rounded-xl bg-card border border-border text-sm font-semibold hover:bg-muted transition-colors"
+              >
+                Try Again
+              </button>
+              <button
+                onClick={() => navigate('/coach')}
+                className="flex-1 py-3 rounded-xl gradient-hero text-primary-foreground text-sm font-semibold shadow-glow hover:opacity-90 transition-opacity"
+              >
+                View Coaching Plan
+              </button>
+            </div>
+          ) : (
             <button
-              onClick={() => requestScenarioStart(scenarioId!, activeScenario || undefined)}
-              className="flex-1 py-3 rounded-xl bg-card border border-border text-sm font-semibold hover:bg-muted transition-colors"
+              onClick={() => navigate('/register')}
+              className="w-full py-3.5 rounded-xl gradient-hero text-primary-foreground font-semibold shadow-glow hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
             >
-              Try Again
+              <Lock className="w-4 h-4" /> Unlock Full Report & 14-Day Plan
             </button>
-            <button
-              onClick={exitChat}
-              className="flex-1 py-3 rounded-xl gradient-hero text-primary-foreground text-sm font-semibold shadow-glow hover:opacity-90 transition-opacity"
-            >
-              New Scenario
-            </button>
-          </div>
+          )}
         </motion.div>
       </div>
       </>

@@ -36,7 +36,7 @@ const Onboarding = () => {
 
   const finish = () => {
     setProfile({ goals: selectedGoals, context: selectedContext, privacyMode, onboardingComplete: true });
-    navigate('/register');
+    navigate('/assessment');
   };
 
   const canNext = step === 0 ? agreed : step === 1 ? selectedGoals.length > 0 : step === 2 ? !!selectedContext : true;
