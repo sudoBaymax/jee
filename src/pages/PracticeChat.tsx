@@ -630,203 +630,31 @@ const PracticeChat = () => {
   if (!scenarioId) {
     return (
       <>
-      {voiceSetupDialogElement}
-      <div className="min-h-screen gradient-calm flex items-center justify-center p-4">
-        <motion.div className="w-full max-w-lg space-y-6" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <button onClick={() => navigate('/coach')} className="text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <div className="text-center space-y-2">
-            <h1 className="text-2xl font-bold">Practice Chat</h1>
-            <p className="text-muted-foreground text-sm">Choose a scenario — then type freely. The AI will respond in character.</p>
-          </div>
-          <div className="space-y-3">
-            {/* Random scenario button */}
-            <button
-              onClick={() => {
-                const random = getRandomScenario();
-                requestScenarioStart(random.id, random);
-              }}
-              className="w-full bg-card rounded-xl p-5 shadow-soft text-left flex items-start gap-4 hover:shadow-glow transition-shadow border-2 border-dashed border-primary/30"
-            >
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <MessageCircle className="w-5 h-5 text-primary" />
-              </div>
-              <div className="flex-1">
-                <p className="font-semibold">🎲 Surprise Me</p>
-                <p className="text-xs text-primary/70 font-medium mt-0.5">Random scenario each time</p>
-                <p className="text-sm text-muted-foreground leading-snug mt-1">Get a fresh, realistic situation to practice your communication skills.</p>
-              </div>
-            </button>
-
-            {/* Create Your Own */}
-            <button
-              onClick={() => setShowCustomForm(!showCustomForm)}
-              className="w-full bg-card rounded-xl p-5 shadow-soft text-left flex items-start gap-4 hover:shadow-glow transition-shadow border-2 border-dashed border-accent/50"
-            >
-              <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <PenLine className="w-5 h-5 text-primary" />
-              </div>
-              <div className="flex-1">
-                <p className="font-semibold">✍️ Create Your Own</p>
-                <p className="text-xs text-primary/70 font-medium mt-0.5">Describe any situation</p>
-                <p className="text-sm text-muted-foreground leading-snug mt-1">Type your own scenario and pick the attachment style of the person you're talking to.</p>
-              </div>
-            </button>
-
-            <AnimatePresence>
-              {showCustomForm && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="overflow-hidden"
-                >
-                  <div className="bg-card rounded-xl p-5 shadow-soft space-y-4 border border-border">
-                    <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <label className="text-sm font-medium text-foreground">Describe your scenario</label>
-                        <VoiceMicButton onTranscript={(text) => setCustomPrompt(text)} />
-                      </div>
-                      <textarea
-                        value={customPrompt}
-                        onChange={e => setCustomPrompt(e.target.value)}
-                        placeholder="e.g. My partner shuts down every time I bring up moving in together. I want to have the conversation tonight..."
-                        className="w-full bg-muted rounded-lg p-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-ring min-h-[100px]"
-                        rows={4}
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-foreground mb-2 block">Their attachment style</label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {[
-                          { value: 'dismissive-avoidant', label: '🧊 Avoidant', desc: 'Pulls away, shuts down' },
-                          { value: 'anxious-preoccupied', label: '🔥 Anxious', desc: 'Clingy, needs reassurance' },
-                          { value: 'fearful-avoidant', label: '🌪️ Fearful-Avoidant', desc: 'Hot & cold, unpredictable' },
-                          { value: 'secure', label: '🌿 Secure', desc: 'Calm but still human' },
-                        ].map(style => (
-                          <button
-                            key={style.value}
-                            onClick={() => setCustomStyle(style.value)}
-                            className={`rounded-lg p-3 text-left transition-all border ${
-                              customStyle === style.value
-                                ? 'border-primary bg-primary/10 shadow-sm'
-                                : 'border-border bg-muted/50 hover:border-primary/30'
-                            }`}
-                          >
-                            <p className="text-sm font-medium">{style.label}</p>
-                            <p className="text-xs text-muted-foreground">{style.desc}</p>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    {/* Screenshot upload */}
-                    <div>
-                      <label className="text-sm font-medium text-foreground mb-1.5 block">Screenshots of their texts <span className="text-muted-foreground font-normal">(optional)</span></label>
-                      <p className="text-xs text-muted-foreground mb-2">Upload screenshots of real conversations so the AI mimics their style</p>
-                      <div
-                        ref={dropZoneRef}
-                        onDrop={handleDrop}
-                        onDragOver={e => { e.preventDefault(); e.stopPropagation(); }}
-                        onClick={() => fileInputRef.current?.click()}
-                        className="border-2 border-dashed border-border rounded-lg p-4 text-center cursor-pointer hover:border-primary/40 transition-colors"
-                      >
-                        <ImagePlus className="w-6 h-6 mx-auto text-muted-foreground mb-1" />
-                        <p className="text-xs text-muted-foreground">Drag & drop, paste, or click to upload</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">{screenshots.length}/5 screenshots</p>
-                      </div>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        className="hidden"
-                        onChange={e => {
-                          const files = Array.from(e.target.files || []);
-                          files.forEach(addScreenshot);
-                          e.target.value = '';
-                        }}
-                      />
-                      {screenshots.length > 0 && (
-                        <div className="flex gap-2 mt-2 overflow-x-auto pb-1">
-                          {screenshots.map((src, i) => (
-                            <div key={i} className="relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border border-border">
-                              <img src={src} alt={`Screenshot ${i + 1}`} className="w-full h-full object-cover" />
-                              <button
-                                onClick={(e) => { e.stopPropagation(); setScreenshots(prev => prev.filter((_, j) => j !== i)); }}
-                                className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center"
-                              >
-                                <X className="w-3 h-3" />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-foreground mb-2 block">
-                        Intensity: {intensity}/10
-                        <span className="text-xs text-muted-foreground ml-2">
-                          {intensity <= 3 ? '😌 Mild' : intensity <= 5 ? '😐 Moderate' : intensity <= 7 ? '😤 Challenging' : '🔥 Intense'}
-                        </span>
-                      </label>
-                      <input
-                        type="range"
-                        min={1}
-                        max={10}
-                        value={intensity}
-                        onChange={e => setIntensity(Number(e.target.value))}
-                        className="w-full accent-primary"
-                      />
-                      <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                        <span>Easy-going</span>
-                        <span>Very difficult</span>
-                      </div>
-                    </div>
-                    <button
-                      onClick={startCustomScenario}
-                      disabled={!customPrompt.trim() || generatingCustom}
-                      className="w-full bg-primary text-primary-foreground rounded-lg py-3 font-medium text-sm disabled:opacity-50 flex items-center justify-center gap-2"
-                    >
-                      {generatingCustom ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          Setting the scene...
-                        </>
-                      ) : (
-                        'Start Conversation'
-                      )}
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {scenarios.map(s => {
-              const styleLabel = s.attachmentStyle === 'dismissive-avoidant' ? '🧊 Dismissive-Avoidant'
-                : s.attachmentStyle === 'anxious-preoccupied' ? '🔥 Anxious-Preoccupied'
-                : s.attachmentStyle === 'fearful-avoidant' ? '🌪️ Fearful-Avoidant'
-                : '🌿 Secure';
-              return (
-                <button
-                  key={s.id}
-                  onClick={() => requestScenarioStart(s.id)}
-                  className="w-full bg-card rounded-xl p-5 shadow-soft text-left flex items-start gap-4 hover:shadow-glow transition-shadow"
-                >
-                  <div className="w-10 h-10 rounded-lg bg-sage-light flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <s.icon className="w-5 h-5 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-semibold">{s.label}</p>
-                    <p className="text-xs text-primary/70 font-medium mt-0.5">{styleLabel}</p>
-                    <p className="text-sm text-muted-foreground leading-snug mt-1">{s.desc}</p>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </motion.div>
-      </div>
+        {voiceSetupDialogElement}
+        <ScenarioSelector
+          scenarios={scenarios}
+          onStartRandom={() => {
+            const random = getRandomScenario();
+            requestScenarioStart(random.id, random);
+          }}
+          showCustomForm={showCustomForm}
+          setShowCustomForm={setShowCustomForm}
+          customPrompt={customPrompt}
+          setCustomPrompt={setCustomPrompt}
+          customStyle={customStyle}
+          setCustomStyle={setCustomStyle}
+          intensity={intensity}
+          setIntensity={setIntensity}
+          screenshots={screenshots}
+          setScreenshots={setScreenshots}
+          addScreenshot={addScreenshot}
+          generatingCustom={generatingCustom}
+          onStartCustom={startCustomScenario}
+          onSelectScenario={(id) => requestScenarioStart(id)}
+          fileInputRef={fileInputRef}
+          dropZoneRef={dropZoneRef}
+          handleDrop={handleDrop}
+        />
       </>
     );
   }
