@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, Volume2, X, Mic, Phone, MessageSquareText } from 'lucide-react';
+import { Loader2, Volume2, X, Mic, Phone, MessageSquareText, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import VoiceMicButton from '@/components/VoiceMicButton';
@@ -46,12 +46,12 @@ const voiceModes = [
 ];
 
 const presets = [
-  'Deep male voice, calm and measured',
-  'Young woman, expressive and emotional',
-  'Older man, gruff but caring',
-  'Soft-spoken, gentle, slightly nervous',
-  'Confident, slightly condescending tone',
-  'Warm motherly voice, guilt-tripping',
+  { label: '🧊 Calm & cold', value: 'Calm but slightly cold, measured tone, American accent' },
+  { label: '🔥 Angry & impatient', value: 'Angry and impatient, slightly raised voice, snappy' },
+  { label: '😢 Soft & hurt', value: 'Soft-spoken, slightly trembling, holding back tears' },
+  { label: '😤 Condescending', value: 'Confident, slightly condescending, talks down to you' },
+  { label: '👩 Guilt-tripping mom', value: 'Warm motherly voice, guilt-tripping, sighs a lot' },
+  { label: '🗿 Gruff older man', value: 'Older man, gruff but caring, deep voice' },
 ];
 
 export default function VoiceSetupDialog({
@@ -67,6 +67,8 @@ export default function VoiceSetupDialog({
   const [matching, setMatching] = useState(false);
   const [matchedVoice, setMatchedVoice] = useState<{ id: string; name: string; reason: string } | null>(null);
   const [previewing, setPreviewing] = useState(false);
+
+  const hasDescription = description.trim().length >= 5;
 
   const matchVoice = async () => {
     setMatching(true);
@@ -124,6 +126,17 @@ export default function VoiceSetupDialog({
     }
   };
 
+  const handlePresetClick = (presetValue: string) => {
+    // Only fill if empty, otherwise append
+    if (!description.trim()) {
+      setDescription(presetValue);
+    } else {
+      setDescription(presetValue);
+    }
+    // Clear any previous match since description changed
+    setMatchedVoice(null);
+  };
+
   const handleConfirm = () => {
     onConfirm({
       mode,
@@ -134,6 +147,26 @@ export default function VoiceSetupDialog({
   };
 
   if (!open) return null;
+
+  const getButtonState = () => {
+    if (mode === 'text') return { text: 'Start Conversation →', enabled: true, glow: true };
+    if (matching) return { text: 'Creating persona...', enabled: false, glow: false };
+    if (matchedVoice) return { text: 'Start with This Voice →', enabled: true, glow: true };
+    if (hasDescription) return { text: 'Generate Persona', enabled: true, glow: true };
+    return { text: 'Describe their tone to begin', enabled: false, glow: false };
+  };
+
+  const btnState = getButtonState();
+
+  const handleMainButton = () => {
+    if (mode === 'text') {
+      handleConfirm();
+    } else if (matchedVoice) {
+      handleConfirm();
+    } else if (hasDescription) {
+      matchVoice();
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -154,8 +187,8 @@ export default function VoiceSetupDialog({
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-display font-semibold text-lg text-foreground">Voice Setup</h3>
-              <p className="text-xs text-muted-foreground">How should they sound?</p>
+              <h3 className="font-display font-semibold text-lg text-foreground">Set the Scene</h3>
+              <p className="text-xs text-muted-foreground">Choose how you want to practice</p>
             </div>
             <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-muted transition-colors">
               <X className="w-4 h-4 text-muted-foreground" />
@@ -194,53 +227,46 @@ export default function VoiceSetupDialog({
           {/* Voice description — only show for voice modes */}
           {mode !== 'text' && (
             <div className="space-y-3">
+              {/* Text area */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="text-sm font-medium text-foreground">
-                    Describe their voice
+                    Describe their tone
                   </label>
-                  <VoiceMicButton onTranscript={(text) => setDescription(text)} />
+                  <VoiceMicButton onTranscript={(text) => { setDescription(text); setMatchedVoice(null); }} />
                 </div>
                 <textarea
                   value={description}
-                  onChange={e => setDescription(e.target.value)}
-                  placeholder="e.g. A 30-year-old guy with a calm but slightly cold voice, American accent, speaks slowly..."
-                  className="w-full bg-muted rounded-lg p-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-ring min-h-[80px]"
-                  rows={3}
+                  onChange={e => { setDescription(e.target.value); setMatchedVoice(null); }}
+                  placeholder="e.g. 'Angry and impatient' or 'Calm but condescending'"
+                  className="w-full bg-muted rounded-lg p-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-ring min-h-[70px]"
+                  rows={2}
                 />
               </div>
 
-              {/* Quick presets */}
-              <div className="flex flex-wrap gap-1.5">
-                {presets.map(p => (
-                  <button
-                    key={p}
-                    onClick={() => setDescription(p)}
-                    className="text-xs px-2.5 py-1 rounded-full bg-muted hover:bg-accent border border-border transition-colors text-muted-foreground"
+              {/* Quick presets — fade out when user has typed */}
+              <AnimatePresence>
+                {!hasDescription && (
+                  <motion.div
+                    initial={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden"
                   >
-                    {p}
-                  </button>
-                ))}
-              </div>
-
-              {/* Match button */}
-              <button
-                onClick={matchVoice}
-                disabled={matching || !description.trim()}
-                className="w-full py-2.5 rounded-xl bg-muted hover:bg-accent border border-border text-sm font-medium text-foreground transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {matching ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Finding the perfect voice...
-                  </>
-                ) : (
-                  <>
-                    <Mic className="w-4 h-4" />
-                    Match Voice
-                  </>
+                    <p className="text-xs text-muted-foreground mb-1.5">Or pick a personality:</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {presets.map(p => (
+                        <button
+                          key={p.label}
+                          onClick={() => handlePresetClick(p.value)}
+                          className="text-xs px-2.5 py-1.5 rounded-full bg-muted hover:bg-accent border border-border transition-colors text-foreground font-medium"
+                        >
+                          {p.label}
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
                 )}
-              </button>
+              </AnimatePresence>
 
               {/* Matched result */}
               {matchedVoice && (
@@ -274,13 +300,29 @@ export default function VoiceSetupDialog({
             </div>
           )}
 
-          {/* Confirm */}
+          {/* Main action button — unified, state-driven */}
           <button
-            onClick={handleConfirm}
-            disabled={mode !== 'text' && !matchedVoice && !matching}
-            className="w-full py-3 rounded-xl gradient-hero text-primary-foreground text-sm font-semibold shadow-glow hover:opacity-90 transition-opacity disabled:opacity-50"
+            onClick={handleMainButton}
+            disabled={!btnState.enabled}
+            className={`w-full py-3 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 ${
+              btnState.glow
+                ? 'gradient-hero text-primary-foreground shadow-glow hover:opacity-90'
+                : 'bg-muted text-muted-foreground border border-border'
+            } disabled:opacity-50`}
           >
-            {mode === 'text' ? 'Start Chat' : matchedVoice ? 'Start with This Voice' : 'Match a Voice First'}
+            {matching ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                {btnState.text}
+              </>
+            ) : hasDescription && !matchedVoice && mode !== 'text' ? (
+              <>
+                <Sparkles className="w-4 h-4" />
+                {btnState.text}
+              </>
+            ) : (
+              btnState.text
+            )}
           </button>
         </motion.div>
       </motion.div>
