@@ -1,22 +1,19 @@
 project_id = "lflnspevhvapdhlarxrb"
 
-[functions.practice-chat]
-verify_jwt = false
-
-[functions.grade-conversation]
-verify_jwt = false
-
-[functions.couples-chat]
-verify_jwt = false
-
-[functions.couples-report]
-verify_jwt = false
-
-[functions.voice-match]
-verify_jwt = false
-
-[functions.elevenlabs-tts]
-verify_jwt = false
-
-[functions.elevenlabs-conversation-token]
-verify_jwt = false
+[functions]
+  [functions.auth-email-hook]
+    verify_jwt = false
+  [functions.couples-chat]
+    verify_jwt = false
+  [functions.couples-report]
+    verify_jwt = false
+  [functions.elevenlabs-conversation-token]
+    verify_jwt = false
+  [functions.elevenlabs-tts]
+    verify_jwt = false
+  [functions.grade-conversation]
+    verify_jwt = false
+  [functions.practice-chat]
+    verify_jwt = false
+  [functions.voice-match]
+    verify_jwt = false
