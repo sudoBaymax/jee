@@ -909,7 +909,7 @@ const PracticeChat = () => {
               onClick={() => navigate('/register')}
               className="w-full py-3.5 rounded-xl gradient-hero text-primary-foreground font-semibold shadow-glow hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
             >
-              <Lock className="w-4 h-4" /> Unlock Full Report & 14-Day Plan
+              <Mail className="w-4 h-4" /> Get Free Therapist Tips
             </button>
           )}
         </motion.div>
