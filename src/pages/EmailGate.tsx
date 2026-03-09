@@ -7,8 +7,7 @@ import { Mail, ChevronRight, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const EmailGate = () => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
   const [email, setEmail] = useState('');
   const [saving, setSaving] = useState(false);
   const { assessment, setAppUserId } = useAppState();
