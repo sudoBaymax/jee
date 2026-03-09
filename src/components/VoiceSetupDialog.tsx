@@ -46,12 +46,16 @@ const voiceModes = [
 ];
 
 const presets = [
-  { label: '🧊 Calm & cold', value: 'Calm but slightly cold, measured tone, American accent' },
-  { label: '🔥 Angry & impatient', value: 'Angry and impatient, slightly raised voice, snappy' },
-  { label: '😢 Soft & hurt', value: 'Soft-spoken, slightly trembling, holding back tears' },
-  { label: '😤 Condescending', value: 'Confident, slightly condescending, talks down to you' },
-  { label: '👩 Guilt-tripping mom', value: 'Warm motherly voice, guilt-tripping, sighs a lot' },
-  { label: '🗿 Gruff older man', value: 'Older man, gruff but caring, deep voice' },
+  { label: '🧊 Cold boyfriend', value: 'Young man, calm but slightly cold, measured tone, American accent' },
+  { label: '🔥 Angry girlfriend', value: 'Young woman, angry and impatient, slightly raised voice, snappy, American accent' },
+  { label: '😢 Hurt partner (M)', value: 'Male, soft-spoken, slightly trembling, holding back emotion, British accent' },
+  { label: '😤 Condescending ex (F)', value: 'Woman, confident, slightly condescending, talks down to you, American accent' },
+  { label: '👩 Guilt-tripping mom', value: 'Older woman, warm motherly voice, guilt-tripping, sighs a lot, slight Southern accent' },
+  { label: '🗿 Gruff dad', value: 'Older man, gruff but caring, deep voice, Midwestern American accent' },
+  { label: '🇬🇧 Dismissive ex (M)', value: 'Young man, dismissive and detached, posh British accent, speaks slowly' },
+  { label: '🇲🇽 Emotional partner (F)', value: 'Young woman, passionate and expressive, light Latina accent, emotional' },
+  { label: '🧑‍💼 Passive-aggressive boss (M)', value: 'Middle-aged man, professional but passive-aggressive, calm surface, American accent' },
+  { label: '💅 Sarcastic friend (F)', value: 'Young woman, sarcastic and witty, eye-roll energy, Valley girl accent' },
 ];
 
 export default function VoiceSetupDialog({
