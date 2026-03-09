@@ -86,7 +86,7 @@ const EmailGate = () => {
 
           <button
             type="submit"
-            disabled={saving || !firstName.trim() || !lastName.trim() || !email.trim()}
+            disabled={saving || !email.trim()}
             className="w-full px-6 py-3.5 rounded-xl gradient-hero text-primary-foreground font-semibold shadow-glow hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {saving ? (
