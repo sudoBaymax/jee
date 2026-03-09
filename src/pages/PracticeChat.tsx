@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Send, Loader2, Award, MessageCircle, UserX, Heart, Briefcase, Shield, AlertTriangle, PenLine, Undo2, Mic, MicOff, Gauge, ImagePlus, X, Volume2, Lock, Mail } from 'lucide-react';
+import ScenarioSelector from '@/components/ScenarioSelector';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAppState } from '@/context/AppContext';
