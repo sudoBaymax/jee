@@ -55,9 +55,9 @@ const EmailGate = () => {
           <div className="w-16 h-16 rounded-full gradient-hero mx-auto flex items-center justify-center shadow-glow">
             <Mail className="w-7 h-7 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-bold">Get Free Expert Advice</h1>
+          <h1 className="text-2xl font-bold">Free Advice from Licensed Therapists</h1>
           <p className="text-muted-foreground text-sm leading-relaxed">
-            We'll send you personalized tips from therapists we work with to help with your{' '}
+            We'll send you personalized tips for your{' '}
             <span className="font-semibold text-foreground">{assessment?.lean || 'attachment style'}</span>{' '}
             tendencies — just drop your email below.
           </p>
