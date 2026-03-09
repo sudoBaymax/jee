@@ -15,7 +15,7 @@ const EmailGate = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!firstName.trim() || !lastName.trim() || !email.trim()) return;
+    if (!email.trim()) return;
 
     setSaving(true);
     try {
