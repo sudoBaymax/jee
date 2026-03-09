@@ -123,7 +123,7 @@ const EmailGate = () => {
             {saving ? (
               <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</>
             ) : (
-              <>Unlock Full Report <ChevronRight className="w-4 h-4" /></>
+              <>Send Me the Tips <ChevronRight className="w-4 h-4" /></>
             )}
           </button>
         </form>
