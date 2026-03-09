@@ -109,8 +109,8 @@ serve(async (req) => {
 
   try {
     const { scenario, attachmentStyle, messages, backstory, intensity = 7, screenshots } = await req.json();
-    const GOOGLE_AI_API_KEY = Deno.env.get("GOOGLE_AI_API_KEY");
-    if (!GOOGLE_AI_API_KEY) throw new Error("GOOGLE_AI_API_KEY is not configured");
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const stylePrompt = attachmentPrompts[attachmentStyle] || attachmentPrompts["dismissive-avoidant"];
 
