@@ -17,3 +17,5 @@ project_id = "lflnspevhvapdhlarxrb"
     verify_jwt = false
   [functions.voice-match]
     verify_jwt = false
+  [functions.send-welcome-email]
+    verify_jwt = false
